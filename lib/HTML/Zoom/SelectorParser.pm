@@ -58,6 +58,18 @@ sub _raw_parse_simple_selector {
         }
       };
 
+    # 'el#id' - element + id
+
+    /\G$sel_re#$sel_re/gc and
+      return do {
+        my $id = $1;
+        my $name = $2;
+        sub {
+           $_[0]->{name} && $_[0]->{name} eq $name and
+           $_[0]->{attrs}{id} && $_[0]->{attrs}{id} eq $id
+        }
+      };
+
     confess "Couldn't parse $_ as starting with simple selector";
   }
 }
