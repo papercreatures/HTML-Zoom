@@ -50,6 +50,19 @@ sub _raw_parse_simple_selector {
         }
       };
 
+     # 'el[attr$="foo"]
+
+    /\G$sel_re\[$sel_re\$="$sel_re"\]/gc and
+      return do {
+        my $name = $1;
+        my $attr = $2;
+        my $val = $3;
+        sub {
+           $_[0]->{name} && $_[0]->{name} eq $name and
+           $_[0]->{attrs}{$attr} && $_[0]->{attrs}{$attr} =~ /\Q$val\E$/
+        }
+      };
+
      # 'el[attr="foo"]
 
     /\G$sel_re\[$sel_re="$sel_re"\]/gc and
