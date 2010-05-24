@@ -41,11 +41,11 @@ sub stream_from_proto {
   } elsif ($ref eq 'ARRAY') {
     return $self->stream_from_array(@$proto);
   } elsif ($ref eq 'CODE') {
-    return $proto->();
+    return $self->stream_from_code($proto);
   } elsif ($ref eq 'SCALAR') {
     return $self->_zconfig->parser->html_to_stream($$proto);
-  } elsif (Scalar::Util::blessed($proto) && $proto->can('as_stream')) {
-    my $stream = $proto->as_stream;
+  } elsif (Scalar::Util::blessed($proto) && $proto->can('to_stream')) {
+    my $stream = $proto->to_stream;
     return $self->stream_from_code(sub { $stream->next });
   }
   die "Don't know how to turn $proto (ref $ref) into a stream";
