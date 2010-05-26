@@ -32,28 +32,31 @@ sub _hacky_tag_parser {
       ([^<]*)
     }sxg
   ) {
-    my ($whole, $is_close, $tag_name, $attributes, $is_comment,
+    my ($whole, $is_close, $tag_name, $attributes, $is_special,
         $in_place_close, $content)
       = ($1, $2, $3, $4, $5, $6, $7, $8);
-    next if defined $is_comment;
-    $tag_name =~ tr/A-Z/a-z/;
-    if ($is_close) {
-      $handler->({ type => 'CLOSE', name => $tag_name, raw => $whole });
+    if ($is_special) {
+      $handler->({ type => 'SPECIAL', raw => $whole });
     } else {
-      $attributes = '' if !defined($attributes) or $attributes =~ /^ +$/;
-      $handler->({
-        type => 'OPEN',
-        name => $tag_name,
-        is_in_place_close => $in_place_close,
-        _hacky_attribute_parser($attributes),
-        raw_attrs => $attributes||'',
-        raw => $whole,
-      });
-      if ($in_place_close) {
+      $tag_name =~ tr/A-Z/a-z/;
+      if ($is_close) {
+        $handler->({ type => 'CLOSE', name => $tag_name, raw => $whole });
+      } else {
+        $attributes = '' if !defined($attributes) or $attributes =~ /^ +$/;
         $handler->({
-          type => 'CLOSE', name => $tag_name, raw => '',
-          is_in_place_close => 1
+          type => 'OPEN',
+          name => $tag_name,
+          is_in_place_close => $in_place_close,
+          _hacky_attribute_parser($attributes),
+          raw_attrs => $attributes||'',
+          raw => $whole,
         });
+        if ($in_place_close) {
+          $handler->({
+            type => 'CLOSE', name => $tag_name, raw => '',
+            is_in_place_close => 1
+          });
+        }
       }
     }
     if (length $content) {
