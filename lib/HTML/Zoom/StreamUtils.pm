@@ -41,7 +41,7 @@ sub stream_from_proto {
   } elsif ($ref eq 'ARRAY') {
     return $self->stream_from_array(@$proto);
   } elsif ($ref eq 'CODE') {
-    return $self->stream_from_code($proto);
+    return $proto->();
   } elsif ($ref eq 'SCALAR') {
     return $self->_zconfig->parser->html_to_stream($$proto);
   } elsif (Scalar::Util::blessed($proto) && $proto->can('to_stream')) {
