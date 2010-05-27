@@ -10,6 +10,24 @@ my $sel_re = qr/([$sel_char]+)/;
 
 sub new { bless({}, shift) }
 
+my $match_attr_on_regex = sub {
+   my ($self, $name, $attr, $regex) = @_;
+
+   sub {
+      $self->{name} && $self->{name} eq $name and
+      $self->{attrs}{$attr} && $self->{attrs}{$attr} =~ $regex
+   }
+};
+
+my $match_attr_on_eq = sub {
+   my ($self, $name, $attr, $val) = @_;
+
+   sub {
+      $self->{name} && $self->{name} eq $name and
+      $self->{attrs}{$attr} && $self->{attrs}{$attr} eq $val
+   }
+};
+
 sub _raw_parse_simple_selector {
   for ($_[1]) { # same pos() as outside
 
@@ -40,54 +58,22 @@ sub _raw_parse_simple_selector {
      # 'el[attr^="foo"]
 
     /\G$sel_re\[$sel_re\^="$sel_re"\]/gc and
-      return do {
-        my $name = $1;
-        my $attr = $2;
-        my $val = $3;
-        sub {
-           $_[0]->{name} && $_[0]->{name} eq $name and
-           $_[0]->{attrs}{$attr} && $_[0]->{attrs}{$attr} =~ /^\Q$val\E/
-        }
-      };
+      return do { $_[0]->$match_attr_on_regex($1, $2, qr/^\Q$3\E/) };
 
      # 'el[attr$="foo"]
 
     /\G$sel_re\[$sel_re\$="$sel_re"\]/gc and
-      return do {
-        my $name = $1;
-        my $attr = $2;
-        my $val = $3;
-        sub {
-           $_[0]->{name} && $_[0]->{name} eq $name and
-           $_[0]->{attrs}{$attr} && $_[0]->{attrs}{$attr} =~ /\Q$val\E$/
-        }
-      };
+      return do { $_[0]->$match_attr_on_regex($1, $2, qr/\Q$3\E$/) };
 
      # 'el[attr*="foo"]
 
     /\G$sel_re\[$sel_re\*="$sel_re"\]/gc and
-      return do {
-        my $name = $1;
-        my $attr = $2;
-        my $val = $3;
-        sub {
-           $_[0]->{name} && $_[0]->{name} eq $name and
-           $_[0]->{attrs}{$attr} && $_[0]->{attrs}{$attr} =~ /\Q$val\E/
-        }
-      };
+      return do { $_[0]->$match_attr_on_regex($1, $2, qr/\Q$3\E/) };
 
      # 'el[attr="foo"]
 
     /\G$sel_re\[$sel_re="$sel_re"\]/gc and
-      return do {
-        my $name = $1;
-        my $attr = $2;
-        my $val = $3;
-        sub {
-           $_[0]->{name} && $_[0]->{name} eq $name and
-           $_[0]->{attrs}{$attr} && $_[0]->{attrs}{$attr} eq $val
-        }
-      };
+      return do { $_[0]->$match_attr_on_eq($1, $2, $3) };
 
      # 'el[attr]
 
@@ -131,26 +117,12 @@ sub _raw_parse_simple_selector {
     # 'el.class1' - element + class
 
     /\G$sel_re\.$sel_re/gc and
-      return do {
-        my $cls = $1;
-        my $name = $2;
-        sub {
-           $_[0]->{name} && $_[0]->{name} eq $name and
-           $_[0]->{attrs}{class} && $_[0]->{attrs}{class} eq $cls
-        }
-      };
+      return do { $_[0]->$match_attr_on_eq($1, 'class', $3) };
 
     # 'el#id' - element + id
 
     /\G$sel_re#$sel_re/gc and
-      return do {
-        my $id = $1;
-        my $name = $2;
-        sub {
-           $_[0]->{name} && $_[0]->{name} eq $name and
-           $_[0]->{attrs}{id} && $_[0]->{attrs}{id} eq $id
-        }
-      };
+      return do { $_[0]->$match_attr_on_eq($1, 'id', $3) };
 
     confess "Couldn't parse $_ as starting with simple selector";
   }
