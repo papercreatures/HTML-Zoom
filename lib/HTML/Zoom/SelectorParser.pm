@@ -46,6 +46,18 @@ sub _raw_parse_simple_selector {
         }
       };
 
+    # 'el.class1' - element + class
+
+    /\G$sel_re\.$sel_re/gc and
+      return do {
+        my $cls = $1;
+        my $name = $2;
+        sub {
+           $_[0]->{name} && $_[0]->{name} eq $name and
+           $_[0]->{attrs}{class} && $_[0]->{attrs}{class} eq $cls
+        }
+      };
+
     confess "Couldn't parse $_ as starting with simple selector";
   }
 }
@@ -69,7 +81,7 @@ sub parse_selector {
       }
     };
   }
-} 
-  
+}
+
 
 1;
