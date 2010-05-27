@@ -4,6 +4,16 @@ use Test::More;
 
 use HTML::Zoom;
 
+my $tmpl = <<END;
+<body>
+  <div class="main">
+    <span prop='moo' class="hilight name">Bob</span>
+    <span class="career">Builder</span>
+    <hr />
+  </div>
+</body>
+END
+
 # el#id
 is( HTML::Zoom->from_html('<div id="yo"></div>')
    ->select('div#yo')
@@ -35,6 +45,15 @@ is( HTML::Zoom->from_html('<div frew="yo"></div>')
    ->to_html,
    '<div frew="yo">grg</div>',
    'E[attr="val"] works' );
+
+# el[attr=foo]
+is( HTML::Zoom->from_html('<div frew="yo"></div>')
+    ->select('div[frew=yo]')
+    ->replace_content('grg')
+    ->to_html,
+    '<div frew="yo">grg</div>',
+    'E[attr=val] works' );
+ 
 
 # el[attr*="foo"]
 is( HTML::Zoom->from_html('<div f="frew goog"></div>')
@@ -68,6 +87,14 @@ is( HTML::Zoom->from_html('<div f="foo bar"></div>')
    '<div f="foo bar">grg</div>',
    'E[attr*="val"] works' );
 
+# [attr=bar]
+ok( check_select( '[prop=moo]'), '[attr=bar]' );
+
+# el[attr=bar],[prop=foo]
+is( check_select('span[class=career],[prop=moo]'), 2,
+    'Multiple selectors: el[attr=bar],[attr=foo]');
+
+
 # sel1 sel2
 is( HTML::Zoom->from_html('<table><tr></tr><tr></tr></table>')
    ->select('table tr')
@@ -86,3 +113,16 @@ is( HTML::Zoom->from_html('<table><tr><td></td></tr><tr><td></td></tr></table>')
    'sel1 sel2 sel3 works' );
 
 done_testing;
+
+
+sub check_select{
+    # less crude?:
+    my $output = HTML::Zoom
+    ->from_html($tmpl)
+    ->select(shift)->replace("the monkey")->to_html;
+    my $count = 0;
+    while ( $output =~ /\G?.*the monkey/gc ){
+        $count++;
+    }
+    return $count;
+}
