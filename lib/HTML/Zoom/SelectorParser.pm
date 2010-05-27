@@ -14,8 +14,8 @@ my $match_attr_on_regex = sub {
    my ($self, $name, $attr, $regex) = @_;
 
    sub {
-      $self->{name} && $self->{name} eq $name and
-      $self->{attrs}{$attr} && $self->{attrs}{$attr} =~ $regex
+      $_[0]->{name} && $_[0]->{name} eq $name and
+      $_[0]->{attrs}{$attr} && $_[0]->{attrs}{$attr} =~ $regex
    }
 };
 
@@ -23,8 +23,8 @@ my $match_attr_on_eq = sub {
    my ($self, $name, $attr, $val) = @_;
 
    sub {
-      $self->{name} && $self->{name} eq $name and
-      $self->{attrs}{$attr} && $self->{attrs}{$attr} eq $val
+      $_[0]->{name} && $_[0]->{name} eq $name and
+      $_[0]->{attrs}{$attr} && $_[0]->{attrs}{$attr} eq $val
    }
 };
 
@@ -86,6 +86,15 @@ sub _raw_parse_simple_selector {
         }
       };
 
+    # 'el.class1' - element + class
+
+    /\G$sel_re\.$sel_re/gc and
+      return do { $_[0]->$match_attr_on_eq($1, 'class', $2) };
+
+    # 'el#id' - element + id
+    /\G$sel_re#$sel_re/gc and
+      return do { $_[0]->$match_attr_on_eq($1, 'id', $2) };
+
     # 'element' - match on tag name
 
     /\G$sel_re/gc and
@@ -113,16 +122,6 @@ sub _raw_parse_simple_selector {
           && !grep $_[0]->{attrs}{class} !~ /(^|\s+)$_($|\s+)/, @cl
         }
       };
-
-    # 'el.class1' - element + class
-
-    /\G$sel_re\.$sel_re/gc and
-      return do { $_[0]->$match_attr_on_eq($1, 'class', $3) };
-
-    # 'el#id' - element + id
-
-    /\G$sel_re#$sel_re/gc and
-      return do { $_[0]->$match_attr_on_eq($1, 'id', $3) };
 
     confess "Couldn't parse $_ as starting with simple selector";
   }
