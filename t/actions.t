@@ -268,12 +268,12 @@ is(
     $_->repeat_content(
       [
         sub {
-          HTML::Zoom::CodeStream->from_array(
+          HTML::Zoom::ArrayStream->new({ array => [
             (filter
               filter($_ => '.name' => $r_content->('mst'))
               => '.career' => $r_content->('Chainsaw Wielder')),
-            HTML::Zoom::CodeStream->from_array(@between)
-          )->flatten
+            HTML::Zoom::ArrayStream->new({ array => \@between })
+          ] })->flatten
         },
         sub {
           filter

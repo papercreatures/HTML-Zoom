@@ -9,7 +9,8 @@ sub new {
   bless({ _source => $args->{source}, _zconfig => $args->{zconfig} }, $class);
 }
 
-sub next {
+sub _next {
+
   return unless (my $self = shift)->{_source};
   my ($next, $s);
   until (($next) = ($s = $self->{_cur}) ? $s->next : ()) {

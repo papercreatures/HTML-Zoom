@@ -8,6 +8,7 @@ use Scalar::Util ();
 
 use HTML::Zoom::CodeStream;
 use HTML::Zoom::FilterStream;
+use HTML::Zoom::ArrayStream;
 
 sub stream_from_code {
   my ($self, $code) = @_;
@@ -20,10 +21,10 @@ sub stream_from_code {
 sub stream_from_array {
   my $self = shift;
   my @array = @_;
-  $self->stream_from_code(sub {
-    return unless @array;
-    return shift @array;
-  });
+  HTML::Zoom::ArrayStream->new({
+    array => \@array,
+    zconfig => $self->_zconfig,
+  })
 }
 
 sub stream_concat {

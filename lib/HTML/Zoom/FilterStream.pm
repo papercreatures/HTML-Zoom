@@ -17,14 +17,8 @@ sub new {
   );
 }
 
-sub next {
+sub _next {
   my ($self) = @_;
-
-  # peeked entry so return that
-
-  if (exists $self->{_peeked}) {
-    return (delete $self->{_peeked});
-  }
 
   # if our main stream is already gone then we can short-circuit
   # straight out - there's no way for an alternate stream to be there

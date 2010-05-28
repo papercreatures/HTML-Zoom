@@ -12,7 +12,7 @@ sub new {
   }, $class);
 }
 
-sub next {
+sub _next {
   return unless (my $self = shift)->{_source};
   # If we were aiming for a "true" perl-like map then we should
   # elegantly handle the case where the map function returns 0 events

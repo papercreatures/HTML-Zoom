@@ -11,11 +11,24 @@ sub peek {
   if (exists $self->{_peeked}) {
     return ($self->{_peeked});
   }
-  if (my ($peeked) = $self->next) {
+  if (my ($peeked) = $self->_next) {
     return ($self->{_peeked} = $peeked);
   }
   return;
 }
+
+sub next {
+  my ($self) = @_;
+
+  # peeked entry so return that
+
+  if (exists $self->{_peeked}) {
+    return (delete $self->{_peeked});
+  }
+
+  $self->_next;
+}
+
 
 sub flatten {
   my $self = shift;
