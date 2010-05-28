@@ -50,29 +50,35 @@ sub _raw_parse_simple_selector {
 
     # '[attr^=foo]' - match attribute with ^ anchored regex
     /\G\[$sel_re\^=$match_value_re\]/gc and
-      return do{
+      return do {
         my $attribute = $1;
         my $value = $2;
-        $_[0]->{attrs}{$attribute}
-        && $_[0]->{attrs}{$attribute} =~ qr/^\Q$value\E/;
+        sub {
+          $_[0]->{attrs}{$attribute}
+          && $_[0]->{attrs}{$attribute} =~ qr/^\Q$value\E/;
+        }
       };
 
     # '[attr$=foo]' - match attribute with $ anchored regex
     /\G\[$sel_re\$=$match_value_re\]/gc and
-      return do{
+      return do {
         my $attribute = $1;
         my $value = $2;
-        $_[0]->{attrs}{$attribute}
-        && $_[0]->{attrs}{$attribute} =~ qr/\Q$value\E$/;
+        sub {
+          $_[0]->{attrs}{$attribute}
+          && $_[0]->{attrs}{$attribute} =~ qr/\Q$value\E$/;
+        }
       };
 
     # '[attr*=foo] - match attribute with regex:
     /\G\[$sel_re\*=$match_value_re\]/gc and
-      return do{
+      return do {
         my $attribute = $1;
         my $value = $2;
-        $_[0]->{attrs}{$attribute}
-        && $_[0]->{attrs}{$attribute} =~ qr/\Q$value\E$/;
+        sub {
+          $_[0]->{attrs}{$attribute}
+          && $_[0]->{attrs}{$attribute} =~ qr/\Q$value\E/;
+        }
       };
 
     # '[attr=bar]' - match attributes
@@ -80,7 +86,7 @@ sub _raw_parse_simple_selector {
       return do {
         my $attribute = $1;
         my $value = $2;
-        sub{
+        sub {
           $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} eq $value;
         }
@@ -90,7 +96,9 @@ sub _raw_parse_simple_selector {
     /\G\[$sel_re\]/gc and
       return do {
         my $attribute = $1;
-        $_[0]->{attrs}{$attribute};
+        sub {
+          exists $_[0]->{attrs}{$attribute};
+        }
       }
   }
 }
