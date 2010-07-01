@@ -678,7 +678,7 @@ In normal usage, you probably don't need to call this yourself.
 
   my $z2 = $z1->select('div')->replace_content('I AM A DIV!');
 
-Returns an intermediary object of the class L<HTML::Zoom::MatchWithoutFilter>
+Returns an intermediary object of the class L<HTML::Zoom::TransformBuilder>
 on which methods of your L<HTML::Zoom::FilterBuilder> object can be called.
 
 In normal usage you should generally always put the pair of method calls

@@ -2,7 +2,7 @@ package HTML::Zoom::StreamBase;
 
 use strict;
 use warnings FATAL => 'all';
-use HTML::Zoom::MatchWithoutFilter;
+use HTML::Zoom::TransformBuilder;
 
 sub _zconfig { shift->{_zconfig} }
 
@@ -53,18 +53,19 @@ sub with_filter {
   $self->_zconfig->stream_utils->wrap_with_filter($self, $match, $filter);
 }
 
-sub select {
-  my ($self, $selector) = @_;
-  my $match = $self->_parse_selector($selector);
-  return HTML::Zoom::MatchWithoutFilter->construct(
-    $self, $match, $self->_zconfig->filter_builder,
-  );
+sub with_transform {
+  my ($self, $transform) = @_;
+  $transform->apply_to_stream($self);
 }
 
-sub _parse_selector {
+sub select {
   my ($self, $selector) = @_;
-  return $selector if ref($selector); # already a match sub
-  $self->_zconfig->selector_parser->parse_selector($selector);
+  return HTML::Zoom::TransformBuilder->new({
+    zconfig => $self->_zconfig,
+    selector => $selector,
+    filters => [],
+    proto => $self,
+  });
 }
 
 sub apply {
