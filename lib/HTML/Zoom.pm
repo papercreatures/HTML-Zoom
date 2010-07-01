@@ -25,11 +25,16 @@ sub _with {
   bless({ %{$_[0]}, %{$_[1]} }, ref($_[0]));
 }
 
-sub from_html {
+sub from_events {
   my $self = shift->_self_or_new;
   $self->_with({
-    initial_events => $self->zconfig->parser->html_to_events($_[0])
+    initial_events => shift,
   });
+}
+
+sub from_html {
+  my $self = shift->_self_or_new;
+  $self->from_events($self->zconfig->parser->html_to_events($_[0]))
 }
 
 sub from_file {
@@ -52,9 +57,14 @@ sub to_fh {
   HTML::Zoom::ReadFH->from_zoom(shift);
 }
 
+sub to_events {
+  my $self = shift;
+  [ $self->zconfig->stream_utils->stream_to_array($self->to_stream) ];
+}
+
 sub run {
   my $self = shift;
-  $self->zconfig->stream_utils->stream_to_array($self->to_stream);
+  $self->to_events;
   return
 }
 
