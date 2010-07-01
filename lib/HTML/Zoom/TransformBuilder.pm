@@ -3,6 +3,7 @@ package HTML::Zoom::TransformBuilder;
 use strict;
 use warnings FATAL => 'all';
 use base qw(HTML::Zoom::SubObject);
+use HTML::Zoom::Transform;
 
 sub new {
   my ($class, $args) = @_;

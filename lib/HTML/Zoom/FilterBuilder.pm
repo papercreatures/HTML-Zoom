@@ -193,6 +193,20 @@ sub replace {
     my ($evt, $stream) = @_;
     my $emit = $self->_stream_from_proto($replace_with);
     my $coll = &$coll_proto;
+    # if we're replacing the contents of an in place close
+    # then we need to handle that here
+    if ($options->{content}
+        && ref($coll) eq 'HASH'
+        && delete $coll->{is_in_place_close}
+      ) {
+      delete $coll->{raw};
+      my $close = $stream->next;
+      delete @{$close}{qw(is_in_place_close raw)};
+      $emit = $self->_stream_concat(
+                $emit,
+                $self->_stream_from_array($close),
+              );
+    }
     # For a straightforward replace operation we can, in fact, do the emit
     # -before- the collect, and my first cut did so. However in order to
     # use the captured content in generating the new content, we need
@@ -201,9 +215,11 @@ sub replace {
     # for the difference to be noticeable
     return
       ($coll
-        ? (ref $coll eq 'ARRAY'
+        ? (ref $coll eq 'ARRAY' # [ event, stream ]
             ? [ $coll->[0], $self->_stream_concat($coll->[1], $emit) ]
-            : $self->_stream_concat($coll, $emit)
+            : (ref $coll eq 'HASH' # event or stream?
+                 ? [ $coll, $emit ]
+                 : $self->_stream_concat($coll, $emit))
           )
         : $emit
       );

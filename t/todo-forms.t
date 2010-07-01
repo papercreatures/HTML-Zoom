@@ -28,5 +28,7 @@ my $h = $zoom->select('.myform')->repeat_content([
            } } @fields
        ])->to_html;
 
+warn $h;
+
 ok 1;
 done_testing;

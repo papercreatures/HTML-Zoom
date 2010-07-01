@@ -68,6 +68,12 @@ sub select {
   });
 }
 
+sub then {
+  my ($self) = @_;
+  # see notes in HTML/Zoom.pm for why this needs to be fixed
+  $self->select($self->transform->selector);
+}
+
 sub apply {
   my ($self, $code) = @_;
   local $_ = $self;

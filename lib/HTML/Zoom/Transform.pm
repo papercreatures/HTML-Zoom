@@ -3,6 +3,7 @@ package HTML::Zoom::Transform;
 use strict;
 use warnings FATAL => 'all';
 use base qw(HTML::Zoom::SubObject);
+use HTML::Zoom::TransformedStream;
 
 sub new {
   my ($class, $args) = @_;
@@ -36,10 +37,9 @@ sub match {
 
 sub apply_to_stream {
   my ($self, $stream) = @_;
-  HTML::Zoom::FilterStream->new({
+  HTML::Zoom::TransformedStream->new({
     stream => $stream,
-    match => $self->match,
-    filters => $self->filters,
+    transform => $self,
     zconfig => $self->_zconfig,
   });
 }
