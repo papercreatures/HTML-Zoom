@@ -6,6 +6,7 @@ use warnings FATAL => 'all';
 use HTML::Zoom::ZConfig;
 use HTML::Zoom::MatchWithoutFilter;
 use HTML::Zoom::ReadFH;
+use HTML::Zoom::Transform;
 
 sub new {
   my ($class, $args) = @_;
@@ -44,7 +45,12 @@ sub to_stream {
   my $sutils = $self->zconfig->stream_utils;
   my $stream = $sutils->stream_from_array(@{$self->{initial_events}});
   foreach my $filter_spec (@{$self->{filters}||[]}) {
-    $stream = $sutils->wrap_with_filter($stream, @{$filter_spec});
+    $stream = HTML::Zoom::Transform->new({
+                selector => $filter_spec->[0],
+                filters => [ $filter_spec->[1] ],
+                zconfig => $self->zconfig,
+              })->apply_to_stream($stream);
+    #$stream = $sutils->wrap_with_filter($stream, @{$filter_spec});
   }
   $stream
 }

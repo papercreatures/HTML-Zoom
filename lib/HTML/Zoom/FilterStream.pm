@@ -6,6 +6,11 @@ use base qw(HTML::Zoom::StreamBase);
 
 sub new {
   my ($class, $args) = @_;
+  if ($args->{filters}) {
+    die "Single filter please (XXX FIXME)"
+      unless @{$args->{filters}} == 1;
+    $args->{filter} = $args->{filters}[0];
+  }
   bless(
     {
       _stream => $args->{stream},
