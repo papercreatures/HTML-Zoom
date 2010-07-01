@@ -197,11 +197,11 @@ sub replace {
     # then we need to handle that here
     if ($options->{content}
         && ref($coll) eq 'HASH'
-        && delete $coll->{is_in_place_close}
+        && $coll->{is_in_place_close}
       ) {
-      delete $coll->{raw};
       my $close = $stream->next;
-      delete @{$close}{qw(is_in_place_close raw)};
+      # shallow copy and nuke in place and raw (to force smart print)
+      $_ = { %$_ }, delete @{$_}{qw(is_in_place_close raw)} for ($coll, $close);
       $emit = $self->_stream_concat(
                 $emit,
                 $self->_stream_from_array($close),
