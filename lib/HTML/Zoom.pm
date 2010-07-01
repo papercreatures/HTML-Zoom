@@ -4,9 +4,9 @@ use strict;
 use warnings FATAL => 'all';
 
 use HTML::Zoom::ZConfig;
-use HTML::Zoom::MatchWithoutFilter;
 use HTML::Zoom::ReadFH;
 use HTML::Zoom::Transform;
+use HTML::Zoom::TransformBuilder;
 
 sub new {
   my ($class, $args) = @_;
@@ -74,27 +74,37 @@ sub memoize {
   ref($self)->new($self)->from_html($self->to_html);
 }
 
-sub with_filter {
+sub with_transform {
   my $self = shift->_self_or_new;
-  my ($selector, $filter) = @_;
+  my ($transform) = @_;
   $self->_with({
     transforms => [
       @{$self->{transforms}||[]},
-      HTML::Zoom::Transform->new({
-        zconfig => $self->zconfig,
-        selector => $selector,
-        filters => [ $filter ]
-      })
+      $transform
     ]
   });
+}
+  
+sub with_filter {
+  my $self = shift->_self_or_new;
+  my ($selector, $filter) = @_;
+  $self->with_transform(
+    HTML::Zoom::Transform->new({
+      zconfig => $self->zconfig,
+      selector => $selector,
+      filters => [ $filter ]
+    })
+  );
 }
 
 sub select {
   my $self = shift->_self_or_new;
   my ($selector) = @_;
-  return HTML::Zoom::MatchWithoutFilter->construct(
-    $self, $selector, $self->zconfig->filter_builder,
-  );
+  return HTML::Zoom::TransformBuilder->new({
+    zconfig => $self->zconfig,
+    selector => $selector,
+    proto => $self
+  });
 }
 
 # There's a bug waiting to happen here: if you do something like
