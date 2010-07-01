@@ -44,14 +44,7 @@ sub to_stream {
     unless $self->{initial_events};
   my $sutils = $self->zconfig->stream_utils;
   my $stream = $sutils->stream_from_array(@{$self->{initial_events}});
-  foreach my $filter_spec (@{$self->{filters}||[]}) {
-    $stream = HTML::Zoom::Transform->new({
-                selector => $filter_spec->[0],
-                filters => [ $filter_spec->[1] ],
-                zconfig => $self->zconfig,
-              })->apply_to_stream($stream);
-    #$stream = $sutils->wrap_with_filter($stream, @{$filter_spec});
-  }
+  $stream = $_->apply_to_stream($stream) for @{$self->{transforms}||[]};
   $stream
 }
 
@@ -84,18 +77,23 @@ sub memoize {
 sub with_filter {
   my $self = shift->_self_or_new;
   my ($selector, $filter) = @_;
-  my $match = $self->parse_selector($selector);
   $self->_with({
-    filters => [ @{$self->{filters}||[]}, [ $match, $filter ] ]
+    transforms => [
+      @{$self->{transforms}||[]},
+      HTML::Zoom::Transform->new({
+        zconfig => $self->zconfig,
+        selector => $selector,
+        filters => [ $filter ]
+      })
+    ]
   });
 }
 
 sub select {
   my $self = shift->_self_or_new;
   my ($selector) = @_;
-  my $match = $self->parse_selector($selector);
   return HTML::Zoom::MatchWithoutFilter->construct(
-    $self, $match, $self->zconfig->filter_builder,
+    $self, $selector, $self->zconfig->filter_builder,
   );
 }
 
@@ -112,15 +110,9 @@ sub select {
 
 sub then {
   my $self = shift;
-  die "Can't call ->then without a previous filter"
-    unless $self->{filters};
-  $self->select($self->{filters}->[-1][0]);
-}
-
-sub parse_selector {
-  my ($self, $selector) = @_;
-  return $selector if ref($selector); # already a match sub
-  $self->zconfig->selector_parser->parse_selector($selector);
+  die "Can't call ->then without a previous transform"
+    unless $self->{transforms};
+  $self->select($self->{transforms}->[-1]->selector);
 }
 
 1;
@@ -690,15 +682,5 @@ together; the intermediary object isn't designed or expected to stick around.
 
 Re-runs the previous select to allow you to chain actions together on the
 same selector.
-
-=head2 parse_selector
-
-  my $matcher = $zoom->parse_selector('div');
-
-Used by L</select> and L</with_filter> to invoke the current
-L<HTML::Zoom::SelectorParser> object to create a matcher object (currently
-a coderef but this is an implementation detail) for that selector.
-
-In normal usage, you probably don't need to call this yourself.
 
 =cut
