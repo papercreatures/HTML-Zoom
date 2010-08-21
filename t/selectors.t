@@ -126,7 +126,7 @@ sub check_select{
     ->from_html($tmpl)
     ->select(shift)->replace("the monkey")->to_html;
     my $count = 0;
-    while ( $output =~ /\G?.*the monkey/gc ){
+    while ( $output =~ /the monkey/g ){
         $count++;
     }
     return $count;
