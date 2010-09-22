@@ -285,6 +285,62 @@ HTML::Zoom::FilterBuilder - Add Filters to a Stream
 Given a L<HTML::Zoom> stream, provide methods to apply filters which
 alter the content of that stream.
 
+=head1 METHODS
+
+This class defines the following public API
+
+=head2 set_attribute
+
+    TBD
+
+=head2 add_attribute
+
+    TBD
+
+=head2 remove_attribute
+
+    TBD
+
+=head2 collect
+
+    TBD
+
+=head2 collect_content
+
+    TBD
+
+=head2 add_before
+
+    TBD
+
+=head2 add_after
+
+    TBD
+
+=head2 prepend_content
+
+    TBD
+
+=head2 append_content
+
+    TBD
+
+=head2 replace
+
+    TBD
+
+=head2 replace_content
+
+    TBD
+
+=head2 repeat
+
+    TBD
+
+=head2 repeat_content
+
+    TBD
+
 =head1 ALSO SEE
 
 L<HTML::Zoom>
