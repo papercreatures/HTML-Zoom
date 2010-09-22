@@ -275,3 +275,27 @@ sub repeat_content {
 }
 
 1;
+
+=head1 NAME
+
+HTML::Zoom::FilterBuilder - Add Filters to a Stream
+
+=head1 DESCRIPTION
+
+Given a L<HTML::Zoom> stream, provide methods to apply filters which
+alter the content of that stream.
+
+=head1 ALSO SEE
+
+L<HTML::Zoom>
+
+=head1 AUTHORS
+
+See L<HTML::Zoom> for authors.
+
+=head1 LICENSE
+
+See L<HTML::Zoom> for the license.
+
+=cut
+
