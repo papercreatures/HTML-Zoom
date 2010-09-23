@@ -282,9 +282,6 @@ HTML::Zoom::FilterBuilder - Add Filters to a Stream
 
 =head1 SYNOPSIS
 
-use strict;
-use warnings;
-
     use HTML::Zoom;
     my $root = HTML::Zoom
         ->from_html(<<MAIN);
