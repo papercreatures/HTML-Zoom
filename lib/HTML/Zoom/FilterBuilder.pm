@@ -280,6 +280,45 @@ sub repeat_content {
 
 HTML::Zoom::FilterBuilder - Add Filters to a Stream
 
+=head1 SYNOPSIS
+
+use strict;
+use warnings;
+
+    use HTML::Zoom;
+    my $root = HTML::Zoom
+        ->from_html(<<MAIN);
+    <html>
+      <head>
+        <title>Default Title</title>
+      </head>
+      <body>
+        Default Content
+      </body>
+    </html>
+    MAIN
+
+    my $body = HTML::Zoom
+        ->from_html(<<BODY);
+    <div id="stuff">
+        <p>Stuff</p>
+        <p id="p1">Stuff</p>
+    </div>
+    BODY
+
+    print $root
+    ->select('title')
+    ->replace_content('Hello World')
+    ->select('body')
+    ->replace_content($body)
+    ->select('#p1')
+    ->replace_content(sub {
+        ## Ask mst...
+
+        })
+    ->to_html;
+
+
 =head1 DESCRIPTION
 
 Given a L<HTML::Zoom> stream, provide methods to apply filters which
@@ -331,7 +370,8 @@ This class defines the following public API
 
 =head2 replace_content
 
-    TBD
+Given a L<HTML::Zoom/select> result, replace the content with a string, array
+or another L<HTML::Zoom> object.
 
 =head2 repeat
 
