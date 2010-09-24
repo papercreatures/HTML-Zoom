@@ -24,7 +24,7 @@ sub extract_synopsis {
         my $extracted = $1;
         $extracted=~s/^\S.+?$//m; # wipe out non code lines in pod
         my $begin_end = qr[begin|end]x;
-        $extracted=~s/\n^=$begin_end testinfo\n\n//smg; # remove
+        $extracted=~s/\n^=$begin_end testinfo\n\n//smg; # remove test block
 
         return $extracted;
     } else {
@@ -67,9 +67,11 @@ sub create_or_update_test_file {
     print $syn_test $synopsis_string;
 }
 
-find(sub {
+find sub {
+
     my $target_path =
         create_test_path_from_lib $_;
+
     my $synopsis_string =
         create_test_string
         normalize_indent
@@ -80,6 +82,6 @@ find(sub {
         $target_path,
         $synopsis_string,
 
-    }, File::Spec->catfile($Bin, '..', 'lib'));
+}, File::Spec->catfile($Bin, '..', 'lib');
 
 
