@@ -25,7 +25,6 @@ sub extract_synopsis {
         $extracted=~s/^\S.+?$//m; # wipe out non code lines in pod
         my $begin_end = qr[begin|end]x;
         $extracted=~s/\n^=$begin_end testinfo\n\n//smg; # remove test block
-
         return $extracted;
     } else {
         return;
