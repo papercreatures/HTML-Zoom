@@ -16,15 +16,15 @@ my @fields = (
 my $h = $zoom->select('.myform')->repeat_content([
     map { my $field = $_; sub {
               $_->select('label')
-               ->add_attribute( for => $field->{id} )
+               ->add_to_attribute( for => $field->{id} )
                ->then
                ->replace_content( $field->{label} )
                ->select('input')
-               ->add_attribute( name => $field->{name} )
+               ->add_to_attribute( name => $field->{name} )
                ->then
-               ->add_attribute( type => $field->{type} )
+               ->add_to_attribute( type => $field->{type} )
                ->then
-               ->add_attribute( value => $field->{value} )
+               ->add_to_attribute( value => $field->{value} )
            } } @fields
        ])->to_html;
 

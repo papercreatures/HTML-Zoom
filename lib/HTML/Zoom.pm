@@ -298,16 +298,16 @@ cleanly:
     map { my $field = $_; sub {
 
      $_->select('label')
-       ->add_attribute( for => $field->{id} )
+       ->add_to_attribute( for => $field->{id} )
        ->then
        ->replace_content( $field->{label} )
 
        ->select('input')
-       ->add_attribute( name => $field->{name} )
+       ->add_to_attribute( name => $field->{name} )
        ->then
-       ->add_attribute( type => $field->{type} )
+       ->add_to_attribute( type => $field->{type} )
        ->then
-       ->add_attribute( value => $field->{value} )
+       ->add_to_attribute( value => $field->{value} )
 
     } } @fields
   ]);
@@ -696,7 +696,7 @@ together; the intermediary object isn't designed or expected to stick around.
 
 =head2 then
 
-  my $z2 = $z1->select('div')->add_attribute(class => 'spoon')
+  my $z2 = $z1->select('div')->add_to_attribute(class => 'spoon')
                              ->then
                              ->replace_content('I AM A DIV!');
 

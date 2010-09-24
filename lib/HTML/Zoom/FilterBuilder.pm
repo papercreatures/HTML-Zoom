@@ -42,13 +42,17 @@ sub set_attribute {
 
 sub _parse_attribute_args {
   my $self = shift;
-  # allow ->add_attribute(name => 'value')
-  #    or ->add_attribute({ name => 'name', value => 'value' })
+  # allow ->add_to_attribute(name => 'value')
+  #    or ->add_to_attribute({ name => 'name', value => 'value' })
   my ($name, $value) = @_ > 1 ? @_ : @{$_[0]}{qw(name value)};
   return ($name, $self->_zconfig->parser->html_escape($value));
 }
 
 sub add_attribute {
+    die "renamed to add_to_attribute. killing this entirely for 1.0";
+}
+
+sub add_to_attribute {
   my $self = shift;
   my ($name, $value) = $self->_parse_attribute_args(@_);
   sub {
@@ -298,7 +302,8 @@ HTML::Zoom::FilterBuilder - Add Filters to a Stream
   my $body = HTML::Zoom
       ->from_html(<<BODY);
   <div id="stuff">
-      <p>Stuff</p>
+      <p>Well Now</p>
+      <p>Is the Time</p>
   </div>
   BODY
 
@@ -307,6 +312,8 @@ HTML::Zoom::FilterBuilder - Add Filters to a Stream
   ->replace_content('Hello World')
   ->select('body')
   ->replace_content($body)
+  ->select('#stuff p')
+  ->add_to_attribute(class=>'body')
   ->to_html;
 
 will produce:
@@ -347,7 +354,7 @@ This class defines the following public API
 
     TBD
 
-=head2 add_attribute
+=head2 add_to_attribute
 
     TBD
 
