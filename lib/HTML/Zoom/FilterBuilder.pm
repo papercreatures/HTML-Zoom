@@ -282,39 +282,57 @@ HTML::Zoom::FilterBuilder - Add Filters to a Stream
 
 =head1 SYNOPSIS
 
-    use HTML::Zoom;
-    my $root = HTML::Zoom
-        ->from_html(<<MAIN);
-    <html>
-      <head>
-        <title>Default Title</title>
-      </head>
-      <body>
-        Default Content
-      </body>
-    </html>
-    MAIN
+  use HTML::Zoom;
+  my $root = HTML::Zoom
+      ->from_html(<<MAIN);
+  <html>
+    <head>
+      <title>Default Title</title>
+    </head>
+    <body>
+      Default Content
+    </body>
+  </html>
+  MAIN
 
-    my $body = HTML::Zoom
-        ->from_html(<<BODY);
-    <div id="stuff">
-        <p>Stuff</p>
-        <p id="p1">Stuff</p>
-    </div>
-    BODY
+  my $body = HTML::Zoom
+      ->from_html(<<BODY);
+  <div id="stuff">
+      <p>Stuff</p>
+  </div>
+  BODY
 
-    print $root
-    ->select('title')
-    ->replace_content('Hello World')
-    ->select('body')
-    ->replace_content($body)
-    ->select('#p1')
-    ->replace_content(sub {
-        ## Ask mst...
+  my $output =  $root
+  ->select('title')
+  ->replace_content('Hello World')
+  ->select('body')
+  ->replace_content($body)
+  ->to_html;
 
-        })
-    ->to_html;
+will produce:
 
+=begin testinfo
+
+  my $expect = <<HTML;
+
+=end testinfo
+
+  <html>
+    <head>
+      <title>Hello World</title>
+    </head>
+    <body><div id="stuff">
+      <p>Stuff</p>
+  </div>
+  </body>
+  </html>
+
+=begin testinfo
+
+  HTML
+  is($output, $expect, 'Synopsis code works ok');
+
+=end testinfo
 
 =head1 DESCRIPTION
 
