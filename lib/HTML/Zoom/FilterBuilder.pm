@@ -312,8 +312,8 @@ HTML::Zoom::FilterBuilder - Add Filters to a Stream
   ->replace_content('Hello World')
   ->select('body')
   ->replace_content($body)
-  ->select('#stuff p')
-  ->add_to_attribute(class=>'body')
+  ->select('p')
+  ->set_attribute(class=>'para')
   ->to_html;
 
 will produce:
@@ -329,7 +329,8 @@ will produce:
       <title>Hello World</title>
     </head>
     <body><div id="stuff">
-      <p>Stuff</p>
+      <p class="para">Well Now</p>
+      <p class="para">Is the Time</p>
   </div>
   </body>
   </html>
