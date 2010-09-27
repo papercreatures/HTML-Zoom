@@ -8,6 +8,10 @@ use HTML::Zoom::ReadFH;
 use HTML::Zoom::Transform;
 use HTML::Zoom::TransformBuilder;
 
+our $VERSION = '0.009001';
+
+$VERSION = eval $VERSION;
+
 sub new {
   my ($class, $args) = @_;
   my $new = {};
