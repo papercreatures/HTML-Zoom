@@ -8,13 +8,7 @@ use File::Find;
 use File::Spec;
 
 sub slurp_file {
-    undef $/;
-    open(my $fh, '<', shift) || return;
-    if(my $whole_file = <$fh>) {
-        return $whole_file;
-    } else {
-        return;
-    }
+    local (@ARGV, $/) = ($_[0]); <>
 }
 
 sub extract_synopsis {
