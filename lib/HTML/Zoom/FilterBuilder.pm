@@ -303,18 +303,22 @@ HTML::Zoom::FilterBuilder - Add Filters to a Stream
       ->from_html(<<BODY);
   <div id="stuff">
       <p>Well Now</p>
-      <p>Is the Time</p>
+      <p id="p2">Is the Time</p>
   </div>
   BODY
 
   my $output =  $root
-  ->select('title')
-  ->replace_content('Hello World')
-  ->select('body')
-  ->replace_content($body)
-  ->select('p')
-  ->set_attribute(class=>'para')
-  ->to_html;
+    ->select('title')
+    ->replace_content('Hello World')
+    ->select('body')
+    ->replace_content($body)
+    ->then
+    ->set_attribute(class=>'main')
+    ->select('p')
+    ->set_attribute(class=>'para')
+    ->select('#p2')
+    ->set_attribute(class=>'para2')
+    ->to_html;
 
 will produce:
 
@@ -328,9 +332,9 @@ will produce:
     <head>
       <title>Hello World</title>
     </head>
-    <body><div id="stuff">
+    <body class="main"><div id="stuff">
       <p class="para">Well Now</p>
-      <p class="para">Is the Time</p>
+      <p id="p2" class="para2">Is the Time</p>
   </div>
   </body>
   </html>
@@ -353,7 +357,17 @@ This class defines the following public API
 
 =head2 set_attribute
 
-    TBD
+Sets an attribute of a given name to a given value for all matching selections.
+
+    $html_zoom
+      ->select('p')
+      ->set_attribute(class=>'paragraph')
+      ->select('div')
+      ->set_attribute(name=>'class', value=>'divider')
+
+Overrides existing values, if such exist.  When multiple L</set_attribute>
+calls are made against the same or overlapping selection sets, the final
+call wins.
 
 =head2 add_to_attribute
 
