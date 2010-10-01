@@ -30,6 +30,14 @@ my $output =  $root
   ->replace_content($body)
   ->then
   ->set_attribute(class=>'main')
+  ->then
+  ->add_to_attribute(class=>'one-column')
+  ->then
+  ->set_attribute(id=>'top')
+  ->then
+  ->add_to_attribute(id=>'deleteme')
+  ->then
+  ->remove_attribute({name=>'id', value=>'deleteme'})
   ->select('p')
   ->set_attribute(class=>'para')
   ->select('#p2')
@@ -42,7 +50,7 @@ my $expect = <<HTML;
   <head>
     <title>Hello World</title>
   </head>
-  <body class="main"><div id="stuff">
+  <body class="main one-column" id="top"><div id="stuff">
     <p class="para">Well Now</p>
     <p id="p2" class="para2">Is the Time</p>
 </div>

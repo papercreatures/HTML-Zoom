@@ -314,6 +314,14 @@ HTML::Zoom::FilterBuilder - Add Filters to a Stream
     ->replace_content($body)
     ->then
     ->set_attribute(class=>'main')
+    ->then
+    ->add_to_attribute(class=>'one-column')
+    ->then
+    ->set_attribute(id=>'top')
+    ->then
+    ->add_to_attribute(id=>'deleteme')
+    ->then
+    ->remove_attribute({name=>'id'})
     ->select('p')
     ->set_attribute(class=>'para')
     ->select('#p2')
@@ -332,7 +340,7 @@ will produce:
     <head>
       <title>Hello World</title>
     </head>
-    <body class="main"><div id="stuff">
+    <body class="main one-column"><div id="stuff">
       <p class="para">Well Now</p>
       <p id="p2" class="para2">Is the Time</p>
   </div>
@@ -355,7 +363,7 @@ alter the content of that stream.
 
 This class defines the following public API
 
-=head2 set_attribute
+=head2 set_attribute ( $attr=>value | {name=>$attr,value=>$value} )
 
 Sets an attribute of a given name to a given value for all matching selections.
 
@@ -363,19 +371,37 @@ Sets an attribute of a given name to a given value for all matching selections.
       ->select('p')
       ->set_attribute(class=>'paragraph')
       ->select('div')
-      ->set_attribute(name=>'class', value=>'divider')
+      ->set_attribute(name=>'class', value=>'divider');
+
 
 Overrides existing values, if such exist.  When multiple L</set_attribute>
 calls are made against the same or overlapping selection sets, the final
 call wins.
 
-=head2 add_to_attribute
+=head2 add_to_attribute ( $attr=>value | {name=>$attr,value=>$value} )
 
-    TBD
+Adds a value to an existing attribute, or creates one if the attribute does not
+yet exist.
 
-=head2 remove_attribute
+    $html_zoom
+      ->select('p')
+      ->set_attribute(class=>'paragraph')
+      ->then
+      ->add_to_attribute(name=>'class', value=>'divider');
 
-    TBD
+Attributes with more than one value will have a dividing space.
+
+=head2 remove_attribute ( $attr | {name=>$attr} )
+
+Removes an attribute and all its values.
+
+    $html_zoom
+      ->select('p')
+      ->set_attribute(class=>'paragraph')
+      ->then
+      ->remove_attribute('class');
+
+Removes attributes from the original stream or events already added.
 
 =head2 collect
 
