@@ -286,6 +286,8 @@ HTML::Zoom::FilterBuilder - Add Filters to a Stream
 
 =head1 SYNOPSIS
 
+Create an L<HTML::Zoom> instance:
+
   use HTML::Zoom;
   my $root = HTML::Zoom
       ->from_html(<<MAIN);
@@ -293,11 +295,31 @@ HTML::Zoom::FilterBuilder - Add Filters to a Stream
     <head>
       <title>Default Title</title>
     </head>
-    <body>
+    <body bad_attr='junk'>
       Default Content
     </body>
   </html>
   MAIN
+
+Create a new attribute on the  C<body> tag:
+
+  $root = $root
+    ->select('body')
+    ->set_attribute(class=>'main');
+
+Add a extra value to an existing attribute:
+
+  $root = $root
+    ->select('body')
+    ->add_to_attribute(class=>'one-column');
+
+Set the content of the C<title> tag:
+
+  $root = $root
+    ->select('title')
+    ->replace_content('Hello World');
+
+Set content from another L<HTML::Zoom> instance:
 
   my $body = HTML::Zoom
       ->from_html(<<BODY);
@@ -307,31 +329,27 @@ HTML::Zoom::FilterBuilder - Add Filters to a Stream
   </div>
   BODY
 
-  my $output =  $root
-    ->select('title')
-    ->replace_content('Hello World')
+  $root = $root
     ->select('body')
-    ->replace_content($body)
-    ->then
-    ->set_attribute(class=>'main')
-    ->then
-    ->add_to_attribute(class=>'one-column')
-    ->then
-    ->set_attribute(id=>'top')
-    ->then
-    ->add_to_attribute(id=>'deleteme')
-    ->then
-    ->remove_attribute({name=>'id'})
+    ->replace_content($body);
+
+Set an attribute on multiple matches:
+
+  $root = $root
     ->select('p')
-    ->set_attribute(class=>'para')
-    ->select('#p2')
-    ->set_attribute(class=>'para2')
-    ->to_html;
+    ->set_attribute(class=>'para');
+
+Remove an attribute:
+
+  $root = $root
+    ->select('body')
+    ->remove_attribute('bad_attr');
 
 will produce:
 
 =begin testinfo
 
+  my $output = $root->to_html;
   my $expect = <<HTML;
 
 =end testinfo
@@ -342,7 +360,7 @@ will produce:
     </head>
     <body class="main one-column"><div id="stuff">
       <p class="para">Well Now</p>
-      <p id="p2" class="para2">Is the Time</p>
+      <p id="p2" class="para">Is the Time</p>
   </div>
   </body>
   </html>

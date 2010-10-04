@@ -2,6 +2,8 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More qw(no_plan);
 
+
+
 use HTML::Zoom;
 my $root = HTML::Zoom
     ->from_html(<<MAIN);
@@ -9,11 +11,31 @@ my $root = HTML::Zoom
   <head>
     <title>Default Title</title>
   </head>
-  <body>
+  <body bad_attr='junk'>
     Default Content
   </body>
 </html>
 MAIN
+
+
+
+$root = $root
+  ->select('body')
+  ->set_attribute(class=>'main');
+
+
+
+$root = $root
+  ->select('body')
+  ->add_to_attribute(class=>'one-column');
+
+
+
+$root = $root
+  ->select('title')
+  ->replace_content('Hello World');
+
+
 
 my $body = HTML::Zoom
     ->from_html(<<BODY);
@@ -23,36 +45,32 @@ my $body = HTML::Zoom
 </div>
 BODY
 
-my $output =  $root
-  ->select('title')
-  ->replace_content('Hello World')
+$root = $root
   ->select('body')
-  ->replace_content($body)
-  ->then
-  ->set_attribute(class=>'main')
-  ->then
-  ->add_to_attribute(class=>'one-column')
-  ->then
-  ->set_attribute(id=>'top')
-  ->then
-  ->add_to_attribute(id=>'deleteme')
-  ->then
-  ->remove_attribute({name=>'id', value=>'deleteme'})
+  ->replace_content($body);
+
+
+
+$root = $root
   ->select('p')
-  ->set_attribute(class=>'para')
-  ->select('#p2')
-  ->set_attribute(class=>'para2')
-  ->to_html;
+  ->set_attribute(class=>'para');
 
 
+
+$root = $root
+  ->select('body')
+  ->remove_attribute('bad_attr');
+
+
+my $output = $root->to_html;
 my $expect = <<HTML;
 <html>
   <head>
     <title>Hello World</title>
   </head>
-  <body class="main one-column" id="top"><div id="stuff">
+  <body class="main one-column"><div id="stuff">
     <p class="para">Well Now</p>
-    <p id="p2" class="para2">Is the Time</p>
+    <p id="p2" class="para">Is the Time</p>
 </div>
 </body>
 </html>

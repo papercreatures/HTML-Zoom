@@ -16,9 +16,9 @@ sub extract_synopsis {
     my $head_or_cut = qr[head|cut]x;
     if($string=~m/^=head1 SYNOPSIS\n(.*?)^=$head_or_cut/sm) {
         my $extracted = $1;
-        $extracted=~s/^\S.+?$//m; # wipe out non code lines in pod
         my $begin_end = qr[begin|end]x;
         $extracted=~s/\n^=$begin_end testinfo\n\n//smg; # remove test block
+        $extracted=~s/^\S.+?$//smg; # wipe out non code lines in pod
         return $extracted;
     } else {
         return;
