@@ -28,7 +28,13 @@ my $h = $zoom->select('.myform')->repeat_content([
            } } @fields
        ])->to_html;
 
-warn $h;
+is($h, q{<form class="myform" action="/somewhere">
+<label for="foo">foo</label>
+<input name="foo" type="text" value="0" />
 
-ok 1;
+<label for="bar">bar</label>
+<input name="bar" type="radio" value="1" />
+</form>
+}, 'render all ok');
+
 done_testing;
