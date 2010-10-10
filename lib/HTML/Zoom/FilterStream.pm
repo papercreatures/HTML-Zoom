@@ -23,7 +23,7 @@ sub new {
 }
 
 sub _next {
-  my ($self) = @_;
+  my ($self, $am_peek) = @_;
 
   # if our main stream is already gone then we can short-circuit
   # straight out - there's no way for an alternate stream to be there
@@ -35,9 +35,12 @@ sub _next {
   # it's gone - we're still effectively "in the match" but this is the
   # point at which that fact is abstracted away from downstream consumers
 
+  my $_next = $am_peek ? 'peek' : 'next';
+
   if (my $alt = $self->{_alt_stream}) {
 
-    if (my ($evt) = $alt->next) {
+    if (my ($evt) = $alt->$_next) {
+      $self->{_peeked_from} = $alt if $am_peek;
       return $evt;
     }
 
@@ -49,7 +52,9 @@ sub _next {
 
   # if there's no alternate stream currently, process the main stream
 
-  while (my ($evt) = $self->{_stream}->next) {
+  while (my ($evt) = $self->{_stream}->$_next) {
+
+    $self->{_peeked_from} = $self->{_stream} if $am_peek;
 
     # don't match this event? return it immediately
 
@@ -78,8 +83,9 @@ sub _next {
     # the filter returned a stream - if it contains something return the
     # first entry and stash it as the new alternate stream
 
-    if (my ($new_evt) = $res->next) {
+    if (my ($new_evt) = $res->$_next) {
       $self->{_alt_stream} = $res;
+      $self->{_peeked_from} = $res if $am_peek;
       return $new_evt;
     }
 
@@ -87,6 +93,18 @@ sub _next {
     # - this will happens for e.g. with an in place close (<foo />) that's
     # being removed. In that case, we fall off to loop back round and try
     # the next event from our main stream
+  } continue {
+
+    # if we fell off the bottom (empty new alternate stream or filter ate
+    # the event) then we need to advance our internal stream one so that the
+    # top of the while loop gets the right thing; also, we need to clear the
+    # _peeked_from in case our source stream is exhausted (it'll be
+    # re-assigned if the while condition gets a new event)
+
+    if ($am_peek) {
+      $self->{_stream}->next;
+      delete $self->{_peeked_from};
+    }
   }
 
   # main stream exhausted so throw it away so we hit the short circuit

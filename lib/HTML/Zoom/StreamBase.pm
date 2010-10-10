@@ -11,7 +11,7 @@ sub peek {
   if (exists $self->{_peeked}) {
     return ($self->{_peeked});
   }
-  if (my ($peeked) = $self->_next) {
+  if (my ($peeked) = $self->_next(1)) {
     return ($self->{_peeked} = $peeked);
   }
   return;
@@ -23,6 +23,9 @@ sub next {
   # peeked entry so return that
 
   if (exists $self->{_peeked}) {
+    if (my $peeked_from = delete $self->{_peeked_from}) {
+      $peeked_from->next;
+    }
     return (delete $self->{_peeked});
   }
 
@@ -78,6 +81,11 @@ sub apply {
   my ($self, $code) = @_;
   local $_ = $self;
   $self->$code;
+}
+
+sub to_html {
+  my ($self) = @_;
+  $self->_zconfig->producer->html_from_stream($self);
 }
 
 1;
