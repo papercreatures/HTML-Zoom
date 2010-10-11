@@ -96,6 +96,19 @@ ok( check_select( '[prop=moo]'), '[attr=bar]' );
 is( check_select('span[class=career],[prop=moo]'), 2,
     'Multiple selectors: el[attr=bar],[attr=foo]');
 
+TODO:{
+    local $TODO = 'Fix selector error messages';
+    # selector parse error test:
+    eval{
+        HTML::Zoom->from_html('<span att="bar"></span>')
+          ->select('[att=bar')
+          ->replace_content('cats')
+          ->to_html;
+    };
+    like( $@, qr/Error parsing dispatch specification/,
+          'Malformed attribute selector results in a helpful error' );
+};
+
 =pod
 
 # sel1 sel2
@@ -114,6 +127,8 @@ is( HTML::Zoom->from_html('<table><tr><td></td></tr><tr><td></td></tr></table>')
    ->to_html,
    '<table><tr><td>frew</td></tr><tr><td>frew</td></tr></table>',
    'sel1 sel2 sel3 works' );
+
+
 
 =cut
 
