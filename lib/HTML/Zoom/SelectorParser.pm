@@ -99,7 +99,12 @@ sub _raw_parse_simple_selector {
         sub {
           exists $_[0]->{attrs}{$attribute};
         }
-      }
+    };
+    
+    # none of the above matched, try catching some obvious errors:
+
+    # indicate unmatched square bracket:
+    /\G\[[^\]]*/gc and $_[0]->_blam('Unmatched [');
   }
 }
 
