@@ -40,6 +40,14 @@ is( HTML::Zoom->from_html('<div frew="yo"></div>'.$stub)
    '<div frew="yo">grg</div>'.$stub,
    'E[attr] works' );
 
+# *[attr]
+is( HTML::Zoom->from_html('<div frew="yo"></div><span frew="ay"></span>'.$stub)
+   ->select('*[frew]')
+      ->replace_content('grg')
+   ->to_html,
+   '<div frew="yo">grg</div><span frew="ay">grg</span>'.$stub,
+   '*[attr] works' );
+
 # el[attr="foo"]
 is( HTML::Zoom->from_html('<div frew="yo"></div>'.$stub)
    ->select('div[frew="yo"]')
