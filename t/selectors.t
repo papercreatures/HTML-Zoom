@@ -89,6 +89,14 @@ is( HTML::Zoom->from_html('<div f="foo bar"></div>'.$stub)
    '<div f="foo bar">grg</div>'.$stub,
    'E[attr*="val"] works' );
 
+# el[attr~="foo"]
+is( HTML::Zoom->from_html('<div frew="foo bar baz"></div>'.$stub)
+   ->select('div[frew~="bar"]')
+      ->replace_content('grg')
+   ->to_html,
+   '<div frew="foo bar baz">grg</div>'.$stub,
+   'E[attr~="val"] works' );
+
 # [attr=bar]
 ok( check_select( '[prop=moo]'), '[attr=bar]' );
 
