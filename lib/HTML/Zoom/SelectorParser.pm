@@ -92,6 +92,17 @@ sub _raw_parse_simple_selector {
         }
       };
 
+    # '[attr!=bar]' - match attribute contains prefix (for language matches)
+    /\G\[$sel_re\|=$match_value_re\]/gc and
+      return do {
+        my $attribute = $1;
+        my $value = $2;
+        sub {
+          $_[0]->{attrs}{$attribute}
+          && $_[0]->{attrs}{$attribute} =~ qr/^\Q$value\E(?:-|$)/;
+        }
+      };
+
     # '[attr=bar]' - match attributes
     /\G\[$sel_re=$match_value_re\]/gc and
       return do {

@@ -104,6 +104,16 @@ is( HTML::Zoom->from_html('<div frew="foo bar baz"></div>'.$stub)
    '<div frew="foo bar baz">grg</div>'.$stub,
    'E[attr~="val"] works' );
 
+# el[attr|="foo"]
+is( HTML::Zoom->from_html('<div lang="pl"></div><div lang="english"></div>'.
+                          '<div lang="en"></div><div lang="en-US"></div>'.$stub)
+   ->select('div[lang|="en"]')
+      ->replace_content('grg')
+   ->to_html,
+   '<div lang="pl"></div><div lang="english"></div>'.
+   '<div lang="en">grg</div><div lang="en-US">grg</div>'.$stub,
+   'E[attr|="val"] works' );
+
 # [attr=bar]
 ok( check_select( '[prop=moo]'), '[attr=bar]' );
 
