@@ -115,33 +115,32 @@ eval{
 like( $@, qr/Error parsing dispatch specification/,
       'Malformed attribute selector ([att=bar) results in a helpful error' );
 
-=pod
 
+TODO: {
+local $TODO = "descendant selectors doesn't work yet";
 # sel1 sel2
-is( HTML::Zoom->from_html('<table><tr></tr><tr></tr></table>')
+is( eval { HTML::Zoom->from_html('<table><tr></tr><tr></tr></table>')
    ->select('table tr')
-      ->replace_content(\'<td></td>')
-   ->to_html,
+      ->replace_content('<td></td>')
+   ->to_html },
    '<table><tr><td></td></tr><tr><td></td></tr></table>',
    'sel1 sel2 works' );
-
+diag($@) if $@;
 
 # sel1 sel2 sel3
-is( HTML::Zoom->from_html('<table><tr><td></td></tr><tr><td></td></tr></table>')
+is( eval { HTML::Zoom->from_html('<table><tr><td></td></tr><tr><td></td></tr></table>')
    ->select('table tr td')
       ->replace_content('frew')
-   ->to_html,
+   ->to_html },
    '<table><tr><td>frew</td></tr><tr><td>frew</td></tr></table>',
    'sel1 sel2 sel3 works' );
-
-
-
-=cut
+diag($@) if $@;
+}
 
 done_testing;
 
 
-sub check_select{
+sub check_select {
     # less crude?:
     my $output = HTML::Zoom
     ->from_html($tmpl)
