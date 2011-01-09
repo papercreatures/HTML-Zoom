@@ -103,6 +103,17 @@ sub _raw_parse_simple_selector {
         }
       };
 
+    # '[attr!=bar]' - attributes doesn't match
+    /\G\[$sel_re!=$match_value_re\]/gc and
+      return do {
+        my $attribute = $1;
+        my $value = $2;
+        sub {
+          ! ($_[0]->{attrs}{$attribute}
+          && $_[0]->{attrs}{$attribute} eq $value);
+        }
+      };
+
     # '[attr]' - match attribute being present:
     /\G\[$sel_re\]/gc and
       return do {
