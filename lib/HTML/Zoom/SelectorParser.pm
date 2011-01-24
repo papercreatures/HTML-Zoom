@@ -88,7 +88,7 @@ sub _raw_parse_simple_selector {
         my $value = $2;
         sub {
           $_[0]->{attrs}{$attribute}
-          && grep { $_ eq $value } split(' ', $_[0]->{attrs}{$attribute});
+          && $_[0]->{attrs}{$attribute} =~ qr/\b\Q$value\E\b/;
         }
       };
 
