@@ -381,7 +381,7 @@ alter the content of that stream.
 
 This class defines the following public API
 
-=head2 set_attribute ( $attr=>value | {name=>$attr,value=>$value} )
+=head2 set_attribute
 
 Sets an attribute of a given name to a given value for all matching selections.
 
@@ -396,7 +396,7 @@ Overrides existing values, if such exist.  When multiple L</set_attribute>
 calls are made against the same or overlapping selection sets, the final
 call wins.
 
-=head2 add_to_attribute ( $attr=>value | {name=>$attr,value=>$value} )
+=head2 add_to_attribute
 
 Adds a value to an existing attribute, or creates one if the attribute does not
 yet exist.
@@ -409,7 +409,7 @@ yet exist.
 
 Attributes with more than one value will have a dividing space.
 
-=head2 remove_attribute ( $attr | {name=>$attr} )
+=head2 remove_attribute
 
 Removes an attribute and all its values.
 
