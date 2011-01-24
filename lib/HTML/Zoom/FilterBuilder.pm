@@ -423,19 +423,131 @@ Removes attributes from the original stream or events already added.
 
 =head2 collect
 
-    TBD
+Collects and extracts results of L<HTML::Zoom/select>.  It takes the following
+optional common options as hash reference.
+
+=over
+
+=item into [ARRAY REFERENCE]
+
+Where to save collected events (selected elements).
+
+    $z1->select('#main-content')
+       ->collect({ into => \@body })
+       ->run;
+    $z2->select('#main-content')
+       ->replace(\@body)
+       ->memoize;
+
+=item filter [CODE]
+
+Run filter on collected elements (locally setting $_ to stream, and passing
+stream as an argument to given code reference).  Filtered stream would be
+returned.
+
+    $z->select('.outer')
+      ->collect({
+        filter => sub { $_->select('.inner')->replace_content('bar!') },
+        passthrough => 1,
+      })
+
+It can be used to further filter selection.  For example
+
+    $z->select('tr')
+      ->collect({
+        filter => sub { $_->select('td') },
+        passthrough => 1,
+      })
+
+is equivalent to (not implemented yet) descendant selector combination, i.e.
+
+    $z->select('tr td')
+
+=item passthrough [BOOLEAN]
+
+Extract copy of elements; the stream is unchanged (it does not remove collected
+elements).  For example without 'passthrough'
+
+    HTML::Zoom->from_html('<foo><bar /></foo>')
+      ->select('foo')
+      ->collect({ content => 1 })
+      ->to_html
+
+returns '<foo></foo>', while with C<passthrough> option
+
+    HTML::Zoom->from_html('<foo><bar /></foo>')
+      ->select('foo')
+      ->collect({ content => 1, passthough => 1 })
+      ->to_html
+
+returns '<foo><bar /></foo>'.
+
+=item content [BOOLEAN]
+
+Collect content of the element, and not the element itself.
+
+For example
+
+    HTML::Zoom->from_html('<h1>Title</h1><p>foo</p>')
+      ->select('h1')
+      ->collect
+      ->to_html
+
+would return '<p>foo</p>', while
+
+    HTML::Zoom->from_html('<h1>Title</h1><p>foo</p>')
+      ->select('h1')
+      ->collect({ content => 1 })
+      ->to_html
+
+would return '<h1></h1><p>foo</p>'.
+
+See also L</collect_content>.
+
+=item flush_before [BOOLEAN]
+
+Generate C<flush> event before collecting, to ensure that the HTML generated up
+to selected element being collected is flushed throught to the browser.  Usually
+used in L</repeat> or L</repeat_content>.
+
+=back
 
 =head2 collect_content
 
-    TBD
+Collects contents of L<HTML::Zoom/select> result.
+
+    HTML::Zoom->from_file($foo)
+              ->select('#main-content')
+              ->collect_content({ into => \@foo_body })
+              ->run;
+    $z->select('#foo')
+      ->replace_content(\@foo_body)
+      ->memoize;
+
+Equivalent to running L</collect> with C<content> option set.
 
 =head2 add_before
 
-    TBD
+Given a L<HTML::Zoom/select> result, add given content (which might be string,
+array or another L<HTML::Zoom> object) before it.
+
+    $html_zoom
+        ->select('input[name="foo"]')
+        ->add_before(\ '<span class="warning">required field</span>');
 
 =head2 add_after
 
-    TBD
+Like L</add_before>, only after L<HTML::Zoom/select> result.
+
+    $html_zoom
+        ->select('p')
+        ->add_after("\n\n");
+
+You can add zoom events directly
+
+    $html_zoom
+        ->select('p')
+        ->add_after([ { type => 'TEXT', raw => 'O HAI' } ]);
 
 =head2 prepend_content
 
@@ -447,20 +559,101 @@ Removes attributes from the original stream or events already added.
 
 =head2 replace
 
-    TBD
+Given a L<HTML::Zoom/select> result, replace it with a string, array or another
+L<HTML::Zoom> object.  It takes the same optional common options as L</collect>
+(via hash reference).
 
 =head2 replace_content
 
 Given a L<HTML::Zoom/select> result, replace the content with a string, array
 or another L<HTML::Zoom> object.
 
+    $html_zoom
+      ->select('title, #greeting')
+      ->replace_content('Hello world!');
+
 =head2 repeat
 
-    TBD
+    $zoom->select('.item')->repeat(sub {
+      if (my $row = $db_thing->next) {
+        return sub { $_->select('.item-name')->replace_content($row->name) }
+      } else {
+        return
+      }
+    }, { flush_before => 1 });
+
+Run I<$repeat_for>, which should be iterator (code reference) returning
+subroutines, reference to array of subroutines, or other zoom-able object
+consisting of transformations.  Those subroutines would be run with $_
+local-ized to result of L<HTML::Zoom/select> (of collected elements), and with
+said result passed as parameter to subroutine.
+
+You might want to use iterator when you don't have all elements upfront
+
+    $zoom = $zoom->select('.contents')->repeat(sub {
+      while (my $line = $fh->getline) {
+        return sub {
+          $_->select('.lno')->replace_content($fh->input_line_number)
+            ->select('.line')->replace_content($line)
+        }
+      }
+      return
+    });
+
+You might want to use array reference if it doesn't matter that all iterations
+are pre-generated
+
+    $zoom->select('table')->repeat([
+      map {
+        my $elem = $_;
+        sub {
+          $_->select('td')->replace_content($e);
+        }
+      } @list
+    ]);
+
+In addition to common options as in L</collect>, it also supports
+
+=over
+
+=item repeat_between [SELECTOR]
+
+Selects object to be repeated between items.  In the case of array this object
+is put between elements, in case of iterator it is put between results of
+subsequent iterations, in the case of streamable it is put between events
+(->to_stream->next).
+
+See documentation for L</repeat_content>
+
+=back
 
 =head2 repeat_content
 
-    TBD
+Given a L<HTML::Zoom/select> result, run provided iterator passing content of
+this result to this iterator.  Accepts the same options as L</repeat>.
+
+Equivalent to using C<contents> option with L</repeat>.
+
+    $html_zoom
+       ->select('#list')
+       ->repeat_content(
+          [
+             sub {
+                $_->select('.name')->replace_content('Matt')
+                  ->select('.age')->replace_content('26')
+             },
+             sub {
+                $_->select('.name')->replace_content('Mark')
+                  ->select('.age')->replace_content('0x29')
+             },
+             sub {
+                $_->select('.name')->replace_content('Epitaph')
+                  ->select('.age')->replace_content('<redacted>')
+             },
+          ],
+          { repeat_between => '.between' }
+       );
+
 
 =head1 ALSO SEE
 
