@@ -40,6 +40,14 @@ is( HTML::Zoom->from_html('<div frew="yo"></div>'.$stub)
    '<div frew="yo">grg</div>'.$stub,
    'E[attr] works' );
 
+# *[attr]
+is( HTML::Zoom->from_html('<div frew="yo"></div><span frew="ay"></span>'.$stub)
+   ->select('*[frew]')
+      ->replace_content('grg')
+   ->to_html,
+   '<div frew="yo">grg</div><span frew="ay">grg</span>'.$stub,
+   '*[attr] works' );
+
 # el[attr="foo"]
 is( HTML::Zoom->from_html('<div frew="yo"></div>'.$stub)
    ->select('div[frew="yo"]')
@@ -55,7 +63,14 @@ is( HTML::Zoom->from_html('<div frew="yo"></div>'.$stub)
     ->to_html,
     '<div frew="yo">grg</div>'.$stub,
     'E[attr=val] works' );
- 
+
+# el[attr!="foo"]
+is( HTML::Zoom->from_html('<div f="f"></div><div class="quux"></div>'.$stub)
+    ->select('div[class!="waargh"]')
+       ->replace_content('grg')
+    ->to_html,
+    '<div f="f">grg</div><div class="quux">grg</div>'.$stub,
+    'E[attr!="val"] works' );
 
 # el[attr*="foo"]
 is( HTML::Zoom->from_html('<div f="frew goog"></div>'.$stub)
@@ -89,6 +104,24 @@ is( HTML::Zoom->from_html('<div f="foo bar"></div>'.$stub)
    '<div f="foo bar">grg</div>'.$stub,
    'E[attr*="val"] works' );
 
+# el[attr~="foo"]
+is( HTML::Zoom->from_html('<div frew="foo bar baz"></div>'.$stub)
+   ->select('div[frew~="bar"]')
+      ->replace_content('grg')
+   ->to_html,
+   '<div frew="foo bar baz">grg</div>'.$stub,
+   'E[attr~="val"] works' );
+
+# el[attr|="foo"]
+is( HTML::Zoom->from_html('<div lang="pl"></div><div lang="english"></div>'.
+                          '<div lang="en"></div><div lang="en-US"></div>'.$stub)
+   ->select('div[lang|="en"]')
+      ->replace_content('grg')
+   ->to_html,
+   '<div lang="pl"></div><div lang="english"></div>'.
+   '<div lang="en">grg</div><div lang="en-US">grg</div>'.$stub,
+   'E[attr|="val"] works' );
+
 # [attr=bar]
 ok( check_select( '[prop=moo]'), '[attr=bar]' );
 
@@ -107,33 +140,32 @@ eval{
 like( $@, qr/Error parsing dispatch specification/,
       'Malformed attribute selector ([att=bar) results in a helpful error' );
 
-=pod
 
+TODO: {
+local $TODO = "descendant selectors doesn't work yet";
 # sel1 sel2
-is( HTML::Zoom->from_html('<table><tr></tr><tr></tr></table>')
+is( eval { HTML::Zoom->from_html('<table><tr></tr><tr></tr></table>')
    ->select('table tr')
-      ->replace_content(\'<td></td>')
-   ->to_html,
+      ->replace_content('<td></td>')
+   ->to_html },
    '<table><tr><td></td></tr><tr><td></td></tr></table>',
    'sel1 sel2 works' );
-
+diag($@) if $@;
 
 # sel1 sel2 sel3
-is( HTML::Zoom->from_html('<table><tr><td></td></tr><tr><td></td></tr></table>')
+is( eval { HTML::Zoom->from_html('<table><tr><td></td></tr><tr><td></td></tr></table>')
    ->select('table tr td')
       ->replace_content('frew')
-   ->to_html,
+   ->to_html },
    '<table><tr><td>frew</td></tr><tr><td>frew</td></tr></table>',
    'sel1 sel2 sel3 works' );
-
-
-
-=cut
+diag($@) if $@;
+}
 
 done_testing;
 
 
-sub check_select{
+sub check_select {
     # less crude?:
     my $output = HTML::Zoom
     ->from_html($tmpl)

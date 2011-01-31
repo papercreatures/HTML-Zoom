@@ -83,6 +83,17 @@ sub apply {
   $self->$code;
 }
 
+sub apply_if {
+  my ($self, $predicate, $code) = @_;
+  if($predicate) {
+    local $_ = $self;
+    $self->$code;
+  }
+  else {
+    $self;
+  }
+}
+
 sub to_html {
   my ($self) = @_;
   $self->_zconfig->producer->html_from_stream($self);
