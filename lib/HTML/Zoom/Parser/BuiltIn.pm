@@ -1,7 +1,6 @@
 package HTML::Zoom::Parser::BuiltIn;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 use base qw(HTML::Zoom::SubObject);
 
 sub html_to_events {

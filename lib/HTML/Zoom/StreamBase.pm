@@ -1,7 +1,6 @@
 package HTML::Zoom::StreamBase;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 use HTML::Zoom::TransformBuilder;
 
 sub _zconfig { shift->{_zconfig} }

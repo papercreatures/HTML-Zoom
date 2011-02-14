@@ -1,7 +1,6 @@
 package HTML::Zoom::TransformedStream;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 use base qw(HTML::Zoom::FilterStream);
 
 sub new {

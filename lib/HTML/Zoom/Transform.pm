@@ -1,7 +1,6 @@
 package HTML::Zoom::Transform;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 use base qw(HTML::Zoom::SubObject);
 use HTML::Zoom::TransformedStream;
 

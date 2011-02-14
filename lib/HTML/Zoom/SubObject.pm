@@ -1,7 +1,6 @@
 package HTML::Zoom::SubObject;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 use Scalar::Util ();
 
 sub new {

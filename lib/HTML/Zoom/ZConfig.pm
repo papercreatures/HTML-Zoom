@@ -1,7 +1,6 @@
 package HTML::Zoom::ZConfig;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 
 my %DEFAULTS = (
   parser => 'HTML::Zoom::Parser::BuiltIn',

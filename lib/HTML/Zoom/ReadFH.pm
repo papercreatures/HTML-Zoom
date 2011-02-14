@@ -1,7 +1,6 @@
 package HTML::Zoom::ReadFH;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 
 sub from_zoom {
   my ($class, $zoom) = @_;

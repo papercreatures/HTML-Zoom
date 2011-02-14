@@ -1,7 +1,6 @@
 package HTML::Zoom::FlattenedStream;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 use base qw(HTML::Zoom::StreamBase);
 
 sub new {

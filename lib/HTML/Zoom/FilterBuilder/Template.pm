@@ -1,7 +1,6 @@
 package HTML::Zoom::FilterBuilder;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 use Template::Tiny;
 
 sub _template_object {

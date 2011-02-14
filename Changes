@@ -1,4 +1,8 @@
-0.009002 - 2010-10-11
+0.009003 - 2010-10-12
+
+* mst is an idiot and forgot to add strictures.pm as a dependency
+
+0.009002 - 2010-10-12
 
 * Added support for more selector syntax support including: 
   + element#id

@@ -1,5 +1,4 @@
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 use Test::More qw(no_plan);
 
 use HTML::Zoom;

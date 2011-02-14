@@ -1,7 +1,6 @@
 package HTML::Zoom::Producer::BuiltIn;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 use base qw(HTML::Zoom::SubObject);
 
 sub html_from_stream {

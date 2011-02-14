@@ -1,7 +1,6 @@
 package HTML::Zoom::StreamUtils;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 use base qw(HTML::Zoom::SubObject);
 
 use Scalar::Util ();

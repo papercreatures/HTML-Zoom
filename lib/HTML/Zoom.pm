@@ -1,14 +1,13 @@
 package HTML::Zoom;
 
-use strict;
-use warnings FATAL => 'all';
+use strictures 1;
 
 use HTML::Zoom::ZConfig;
 use HTML::Zoom::ReadFH;
 use HTML::Zoom::Transform;
 use HTML::Zoom::TransformBuilder;
 
-our $VERSION = '0.009001';
+our $VERSION = '0.009003';
 
 $VERSION = eval $VERSION;
 

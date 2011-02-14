@@ -1,4 +1,4 @@
-use strict;
+use strictures 1;
 use HTML::Zoom;
 use Test::More skip_all => "Totally doesn't work yet";
 
