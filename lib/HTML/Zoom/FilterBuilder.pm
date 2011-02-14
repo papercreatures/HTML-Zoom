@@ -103,7 +103,20 @@ sub collect {
     my $name = $evt->{name};
     my $depth = 1;
     my $_next = $content ? 'peek' : 'next';
-    $stream = do { local $_ = $stream; $filter->($stream) } if $filter;
+    if ($filter) {
+      if ($content) {
+        $stream = do { local $_ = $stream; $filter->($stream) };
+      } else {
+        $stream = do {
+          local $_ = $self->_stream_concat(
+                       $self->_stream_from_array($evt),
+                       $stream,
+                     );
+          $filter->($_);
+        };
+        $evt = $stream->next;
+      }
+    }
     my $collector = $self->_stream_from_code(sub {
       return unless $stream;
       while (my ($evt) = $stream->$_next) {
