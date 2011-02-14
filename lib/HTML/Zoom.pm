@@ -7,7 +7,7 @@ use HTML::Zoom::ReadFH;
 use HTML::Zoom::Transform;
 use HTML::Zoom::TransformBuilder;
 
-our $VERSION = '0.009003';
+our $VERSION = '0.009004';
 
 $VERSION = eval $VERSION;
 
@@ -717,13 +717,26 @@ together; the intermediary object isn't designed or expected to stick around.
 Re-runs the previous select to allow you to chain actions together on the
 same selector.
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-=over
+mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
 
-=item * Matt S. Trout
+=head1 CONTRIBUTORS
 
-=back
+Oliver Charles
+
+Jakub Nareski
+
+Simon Elliot
+
+Joe Highton
+
+John Napiorkowski
+
+=head1 COPYRIGHT
+
+Copyright (c) 2010-2011 the HTML::Zoom L</AUTHOR> and L</CONTRIBUTORS>
+as listed above.
 
 =head1 LICENSE
 
