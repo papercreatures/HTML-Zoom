@@ -2,11 +2,11 @@
 - apply_if method from ocharles
 - selector improvements and bugfixes (jnareb, mst)
 
-0.009003 - 2010-10-12
+0.009003 2010-10-12
 
 - mst is an idiot and forgot to add strictures.pm as a dependency
 
-0.009002 - 2010-10-12
+0.009002 2010-10-12
 
 - Added support for more selector syntax support including: 
     element#id
@@ -21,6 +21,6 @@
 - Improved documentation, including documentation for HTML::Zoom::FilterBuilder.
 - Lots of other refactoring, internal improvements & bugfixes!
 
-0.009001 - 2010-03-17
+0.009001 2010-03-17
 
 - First release
