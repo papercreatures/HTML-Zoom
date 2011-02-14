@@ -8,5 +8,6 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
   NAME => 'HTML-Zoom',
   VERSION_FROM => 'lib/HTML/Zoom.pm',
-  PREREQ_PM => { strictures => 1 }
+  PREREQ_PM => { strictures => 1, 'Test::More' => '0.88' },
+  test => { TESTS => 't/*.t t/*/*.t' },
 );
