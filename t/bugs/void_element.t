@@ -1,8 +1,5 @@
-#!/usr/bin/perl
-
-use strict;
-use warnings;
-use Test::More;
+use strictures 1;
+use Test::More skip_all => 'TODO test';
 use HTML::Zoom;
 use Test::Fatal;
 
