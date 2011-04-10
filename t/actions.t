@@ -93,6 +93,64 @@ is(
   'remove attribute on non existing attribute'
 );
 
+($expect = $tmpl) =~ s/ class="main"//;
+
+is(
+  run_for {
+      $_->transform_attribute({
+          name => 'class',
+          code => sub {
+              my $a = shift;
+              return if $a eq 'main';
+              return $a;
+          },
+      })
+  },
+  $expect,
+  'transform_attribute deletes the attr if code returns undef',
+  );
+
+($expect = $tmpl) =~ s/ class="main"/ class="moan"/;
+
+is(
+  run_for {
+      $_->transform_attribute({
+          name => 'class',
+          code => sub {
+              ( my $b = shift ) =~ s/main/moan/;
+              $b
+          },
+      })
+  },
+  $expect,
+  'transform_attribute transforms something',
+  );
+
+($expect = $tmpl) =~ s/ class="main"/ class="main" noggin="zonk"/;
+
+is(
+  run_for {
+      $_->transform_attribute({
+          name => 'noggin',
+          code => sub { 'zonk' },
+      })
+  },
+  $expect,
+  'transform_attribute adds attribute if not there before',
+  );
+
+is(
+  run_for {
+      $_->transform_attribute({
+          name => 'noggin',
+          code => sub { },
+      })
+  },
+  $tmpl,
+  'transform_attribute on nonexistent att does not add it if code returns undef',
+  );
+
+
 ($expect = $tmpl) =~ s/(?=<div)/O HAI/;
 
 my $ohai = [ { type => 'TEXT', raw => 'O HAI' } ];

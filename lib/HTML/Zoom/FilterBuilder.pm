@@ -83,6 +83,38 @@ sub remove_attribute {
   };
 }
 
+sub transform_attribute {
+  my $self = shift;
+  my ( $name, $code ) = @_ > 1 ? @_ : @{$_[0]}{qw(name code)};
+
+  sub {
+    my $evt = $_[0];
+    my %a = %{ $evt->{attrs} };
+    my @names = @{ $evt->{attr_names} };
+
+    my $existed_before = exists $a{$name};
+    my $v = $code->( $a{$name} );
+    my $deleted =   $existed_before && ! defined $v;
+    my $added   = ! $existed_before &&   defined $v;
+    if( $added ) {
+        push @names, $name;
+        $a{$name} = $v;
+    }
+    elsif( $deleted ) {
+        delete $a{$name};
+        @names = grep $_ ne $name, @names;
+    } else {
+        $a{$name} = $v;
+    }
+    +{ %$evt, raw => undef, raw_attrs => undef,
+       attrs => \%a,
+      ( $deleted || $added
+        ? (attr_names => \@names )
+        : () )
+     }
+   };
+}
+
 sub collect {
   my ($self, $options) = @_;
   my ($into, $passthrough, $content, $filter, $flush_before) =
@@ -432,6 +464,20 @@ Removes an attribute and all its values.
       ->remove_attribute('class');
 
 Removes attributes from the original stream or events already added.
+
+=head2 transform_attribute
+
+Transforms (or creates or deletes) an attribute by running the passed
+coderef on it.  If the coderef returns nothing, the attribute is
+removed.
+
+    $html_zoom
+      ->select('a')
+      ->transform_attribute( href => sub {
+            ( my $a = shift ) =~ s/localhost/example.com/;
+            return $a;
+          },
+        );
 
 =head2 collect
 

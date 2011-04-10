@@ -733,6 +733,8 @@ Joe Highton
 
 John Napiorkowski
 
+Robert Buels
+
 =head1 COPYRIGHT
 
 Copyright (c) 2010-2011 the HTML::Zoom L</AUTHOR> and L</CONTRIBUTORS>
