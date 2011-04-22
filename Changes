@@ -1,5 +1,19 @@
-  - add transform_attribute method (rbuels)
+TBA
+  - New Feature:  HTML::Zoom will autoload FilterBuilder functions so that
+    you can avoid a bit of boilerplate in method calls.  Now you can replace:
+
+        $z->select('div')->replace_content("Hello World");
+
+    With:
+
+        $z->replace_content(div => "Hello World");
+
+  - Lots of changes to FilterBuilder so that functionality matched the docs
+    better, improved the docs and added tests for documented functions to
+    avoid future regressions.
+
   - add / to excluded characters in attribute names to correctly parse <br/> 
+  - add transform_attribute method (rbuels)
 
 0.009004 2011-02-14
 

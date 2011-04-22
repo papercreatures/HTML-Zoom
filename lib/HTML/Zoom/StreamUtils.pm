@@ -2,7 +2,6 @@ package HTML::Zoom::StreamUtils;
 
 use strictures 1;
 use base qw(HTML::Zoom::SubObject);
-
 use Scalar::Util ();
 
 use HTML::Zoom::CodeStream;

@@ -98,4 +98,11 @@ sub to_html {
   $self->_zconfig->producer->html_from_stream($self);
 }
 
+sub AUTOLOAD {
+  my ($self, $selector, @args) = @_;
+  my $meth = our $AUTOLOAD;
+  $meth =~ s/.*:://;
+  return $self = $self->select($selector)->$meth(@args);
+}
+
 1;

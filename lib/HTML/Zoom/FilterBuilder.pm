@@ -187,7 +187,21 @@ sub collect_content {
 
 sub add_before {
   my ($self, $events) = @_;
-  sub { return $self->_stream_from_array(@$events, $_[0]) };
+  my $coll_proto = $self->collect({ passthrough => 1 });
+  sub {
+    my $emit = $self->_stream_from_proto($events);
+    my $coll = &$coll_proto;
+    if($coll) {
+      if(ref $coll eq 'ARRAY') {
+        my $firstbit = $self->_stream_from_proto([$coll->[0]]);
+        return $self->_stream_concat($emit, $firstbit, $coll->[1]);
+      } elsif(ref $coll eq 'HASH') {
+        return [$emit, $coll];
+      } else {
+        return $self->_stream_concat($emit, $coll);
+      }
+    } else { return $emit }
+  }
 }
 
 sub add_after {
@@ -195,7 +209,7 @@ sub add_after {
   my $coll_proto = $self->collect({ passthrough => 1 });
   sub {
     my ($evt) = @_;
-    my $emit = $self->_stream_from_array(@$events);
+    my $emit = $self->_stream_from_proto($events);
     my $coll = &$coll_proto;
     return ref($coll) eq 'HASH' # single event, no collect
       ? [ $coll, $emit ]
@@ -205,15 +219,18 @@ sub add_after {
 
 sub prepend_content {
   my ($self, $events) = @_;
+  my $coll_proto = $self->collect({ passthrough => 1, content => 1 });
   sub {
     my ($evt) = @_;
+    my $emit = $self->_stream_from_proto($events);
     if ($evt->{is_in_place_close}) {
       $evt = { %$evt }; delete @{$evt}{qw(raw is_in_place_close)};
       return [ $evt, $self->_stream_from_array(
-        @$events, { type => 'CLOSE', name => $evt->{name} }
+        $emit->next, { type => 'CLOSE', name => $evt->{name} }
       ) ];
     }
-    return $self->_stream_from_array($evt, @$events);
+    my $coll = &$coll_proto;
+    return [ $coll->[0], $self->_stream_concat($emit, $coll->[1]) ];
   };
 }
 
@@ -222,14 +239,14 @@ sub append_content {
   my $coll_proto = $self->collect({ passthrough => 1, content => 1 });
   sub {
     my ($evt) = @_;
+    my $emit = $self->_stream_from_proto($events);
     if ($evt->{is_in_place_close}) {
       $evt = { %$evt }; delete @{$evt}{qw(raw is_in_place_close)};
       return [ $evt, $self->_stream_from_array(
-        @$events, { type => 'CLOSE', name => $evt->{name} }
+        $emit->next, { type => 'CLOSE', name => $evt->{name} }
       ) ];
     }
     my $coll = &$coll_proto;
-    my $emit = $self->_stream_from_array(@$events);
     return [ $coll->[0], $self->_stream_concat($coll->[1], $emit) ];
   };
 }
@@ -287,7 +304,7 @@ sub repeat {
   if ($repeat_between) {
     $options->{filter} = sub {
       $_->select($repeat_between)->collect({ into => \@between })
-    };
+    }
   }
   my $repeater = sub {
     my $s = $self->_stream_from_proto($repeat_for);
@@ -433,7 +450,7 @@ Sets an attribute of a given name to a given value for all matching selections.
       ->select('p')
       ->set_attribute(class=>'paragraph')
       ->select('div')
-      ->set_attribute(name=>'class', value=>'divider');
+      ->set_attribute({name=>'class', value=>'divider'});
 
 
 Overrides existing values, if such exist.  When multiple L</set_attribute>
@@ -443,13 +460,23 @@ call wins.
 =head2 add_to_attribute
 
 Adds a value to an existing attribute, or creates one if the attribute does not
-yet exist.
+yet exist.  You may call this method with either an Array or HashRef of Args.
+
+Here's the 'long form' HashRef:
 
     $html_zoom
       ->select('p')
       ->set_attribute(class=>'paragraph')
       ->then
-      ->add_to_attribute(name=>'class', value=>'divider');
+      ->add_to_attribute({name=>'class', value=>'divider'});
+
+And the exact same effect using the 'short form' Array:
+
+    $html_zoom
+      ->select('p')
+      ->set_attribute(class=>'paragraph')
+      ->then
+      ->add_to_attribute(class=>'divider');
 
 Attributes with more than one value will have a dividing space.
 
@@ -609,11 +636,31 @@ You can add zoom events directly
 
 =head2 prepend_content
 
-    TBD
+Similar to add_before, but adds the content to the match.
+
+  HTML::Zoom
+    ->from_html(q[<p>World</p>])
+    ->select('p')
+    ->prepend_content("Hello ")
+    ->to_html
+    
+  ## <p>Hello World</p>
+  
+Acceptable values are strings, scalar refs and L<HTML::Zoom> objects
 
 =head2 append_content
 
-    TBD
+Similar to add_after, but adds the content to the match.
+
+  HTML::Zoom
+    ->from_html(q[<p>Hello </p>])
+    ->select('p')
+    ->prepend_content("World")
+    ->to_html
+    
+  ## <p>Hello World</p>
+
+Acceptable values are strings, scalar refs and L<HTML::Zoom> objects
 
 =head2 replace
 
@@ -632,34 +679,12 @@ or another L<HTML::Zoom> object.
 
 =head2 repeat
 
-    $zoom->select('.item')->repeat(sub {
-      if (my $row = $db_thing->next) {
-        return sub { $_->select('.item-name')->replace_content($row->name) }
-      } else {
-        return
-      }
-    }, { flush_before => 1 });
+For a given selection, repeat over transformations, typically for the purposes
+of populating lists.  Takes either an array of anonymous subroutines or a zoom-
+able object consisting of transformation.
 
-Run I<$repeat_for>, which should be iterator (code reference) returning
-subroutines, reference to array of subroutines, or other zoom-able object
-consisting of transformations.  Those subroutines would be run with $_
-local-ized to result of L<HTML::Zoom/select> (of collected elements), and with
-said result passed as parameter to subroutine.
-
-You might want to use iterator when you don't have all elements upfront
-
-    $zoom = $zoom->select('.contents')->repeat(sub {
-      while (my $line = $fh->getline) {
-        return sub {
-          $_->select('.lno')->replace_content($fh->input_line_number)
-            ->select('.line')->replace_content($line)
-        }
-      }
-      return
-    });
-
-You might want to use array reference if it doesn't matter that all iterations
-are pre-generated
+Example of array reference style (when it doesn't matter that all iterations are
+pre-generated)
 
     $zoom->select('table')->repeat([
       map {
@@ -669,8 +694,27 @@ are pre-generated
         }
       } @list
     ]);
+    
+Subroutines would be run with $_ localized to result of L<HTML::Zoom/select> (of
+collected elements), and with said result passed as parameter to subroutine.
 
-In addition to common options as in L</collect>, it also supports
+You might want to use CodeStream when you don't have all elements upfront
+
+    $zoom->select('.contents')->repeat(sub {
+      HTML::Zoom::CodeStream->new({
+        code => sub {
+          while (my $line = $fh->getline) {
+            return sub {
+              $_->select('.lno')->replace_content($fh->input_line_number)
+                ->select('.line')->replace_content($line)
+            }
+          }
+          return
+        },
+      })
+    });
+
+In addition to common options as in L</collect>, it also supports:
 
 =over
 

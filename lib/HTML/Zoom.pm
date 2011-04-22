@@ -6,6 +6,7 @@ use HTML::Zoom::ZConfig;
 use HTML::Zoom::ReadFH;
 use HTML::Zoom::Transform;
 use HTML::Zoom::TransformBuilder;
+use Scalar::Util ();
 
 our $VERSION = '0.009004';
 
@@ -147,6 +148,18 @@ sub then {
   die "Can't call ->then without a previous transform"
     unless $self->{transforms};
   $self->select($self->{transforms}->[-1]->selector);
+}
+
+sub AUTOLOAD {
+  my ($self, $selector, @args) = @_;
+  my $sel = $self->select($selector);
+  my $meth = our $AUTOLOAD;
+  $meth =~ s/.*:://;
+  if(my $cr = $sel->_zconfig->filter_builder->can($meth)) {
+    return $sel->$meth(@args);
+  } else {
+    die "We can't do $meth on ->select('$selector')";
+  }
 }
 
 1;
@@ -716,6 +729,20 @@ together; the intermediary object isn't designed or expected to stick around.
 
 Re-runs the previous select to allow you to chain actions together on the
 same selector.
+
+=head1 AUTOLOAD METHODS
+
+L<HTML::Zoom> AUTOLOADS methods against L</select> so that you can reduce a
+certain amount of boilerplate typing.  This allows you to replace:
+
+  $z->select('div')->replace_content("Hello World");
+  
+With:
+
+  $z->replace_content(div => "Hello World");
+  
+Besides saving a few keys per invocations, you may feel this looks neater
+in your code and increases understanding.
 
 =head1 AUTHOR
 
