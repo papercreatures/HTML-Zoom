@@ -1,3 +1,4 @@
+  - add transform_attribute method (rbuels)
   - add / to excluded characters in attribute names to correctly parse <br/> 
 
 0.009004 2011-02-14
