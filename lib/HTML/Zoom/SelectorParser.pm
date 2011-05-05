@@ -5,7 +5,8 @@ use base qw(HTML::Zoom::SubObject);
 use Carp qw(confess);
 
 my $sel_char = '-\w_';
-my $sel_re = qr/([$sel_char]+)/;
+my $sel_meta_char = q-!"#$%&'()*+,./:;<=>?@[\]^`{|}~-;
+my $sel_re = qr/((?:(?:\\[\Q$sel_meta_char\E])|[$sel_char])+)/;
 my $match_value_re = qr/"?$sel_re"?/;
 
 
@@ -23,7 +24,7 @@ sub _raw_parse_simple_selector {
 
     /\G$sel_re/gc and
       return do {
-        my $name = $1;
+        my $name = $_[0]->_unescape($1);
         sub { $_[0]->{name} && $_[0]->{name} eq $name }
       };
 
@@ -31,7 +32,7 @@ sub _raw_parse_simple_selector {
 
     /\G#$sel_re/gc and
       return do {
-        my $id = $1;
+        my $id = $_[0]->_unescape($1);
         sub { $_[0]->{attrs}{id} && $_[0]->{attrs}{id} eq $id }
       };
 
@@ -40,18 +41,18 @@ sub _raw_parse_simple_selector {
     /\G((?:\.$sel_re)+)/gc and
       return do {
         my $cls = $1; $cls =~ s/^\.//;
-        my @cl = split(/\./, $cls);
+        my @cl = map $_[0]->_unescape($_), split(/(?<!\\)\./, $cls);
         sub {
           $_[0]->{attrs}{class}
-          && !grep $_[0]->{attrs}{class} !~ /(^|\s+)$_($|\s+)/, @cl
+          && !grep $_[0]->{attrs}{class} !~ /(^|\s+)\Q$_\E($|\s+)/, @cl
         }
       };
 
     # '[attr^=foo]' - match attribute with ^ anchored regex
     /\G\[$sel_re\^=$match_value_re\]/gc and
       return do {
-        my $attribute = $1;
-        my $value = $2;
+        my $attribute = $_[0]->_unescape($1);
+        my $value = $_[0]->_unescape($2);
         sub {
           $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} =~ qr/^\Q$value\E/;
@@ -61,8 +62,8 @@ sub _raw_parse_simple_selector {
     # '[attr$=foo]' - match attribute with $ anchored regex
     /\G\[$sel_re\$=$match_value_re\]/gc and
       return do {
-        my $attribute = $1;
-        my $value = $2;
+        my $attribute = $_[0]->_unescape($1);
+        my $value = $_[0]->_unescape($2);
         sub {
           $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} =~ qr/\Q$value\E$/;
@@ -72,8 +73,8 @@ sub _raw_parse_simple_selector {
     # '[attr*=foo] - match attribute with regex:
     /\G\[$sel_re\*=$match_value_re\]/gc and
       return do {
-        my $attribute = $1;
-        my $value = $2;
+        my $attribute = $_[0]->_unescape($1);
+        my $value = $_[0]->_unescape($2);
         sub {
           $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} =~ qr/\Q$value\E/;
@@ -83,8 +84,8 @@ sub _raw_parse_simple_selector {
     # '[attr~=bar]' - match attribute contains word
     /\G\[$sel_re~=$match_value_re\]/gc and
       return do {
-        my $attribute = $1;
-        my $value = $2;
+        my $attribute = $_[0]->_unescape($1);
+        my $value = $_[0]->_unescape($2);
         sub {
           $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} =~ qr/\b\Q$value\E\b/;
@@ -94,8 +95,8 @@ sub _raw_parse_simple_selector {
     # '[attr!=bar]' - match attribute contains prefix (for language matches)
     /\G\[$sel_re\|=$match_value_re\]/gc and
       return do {
-        my $attribute = $1;
-        my $value = $2;
+        my $attribute = $_[0]->_unescape($1);
+        my $value = $_[0]->_unescape($2);
         sub {
           $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} =~ qr/^\Q$value\E(?:-|$)/;
@@ -105,8 +106,8 @@ sub _raw_parse_simple_selector {
     # '[attr=bar]' - match attributes
     /\G\[$sel_re=$match_value_re\]/gc and
       return do {
-        my $attribute = $1;
-        my $value = $2;
+        my $attribute = $_[0]->_unescape($1);
+        my $value = $_[0]->_unescape($2);
         sub {
           $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} eq $value;
@@ -116,8 +117,8 @@ sub _raw_parse_simple_selector {
     # '[attr!=bar]' - attributes doesn't match
     /\G\[$sel_re!=$match_value_re\]/gc and
       return do {
-        my $attribute = $1;
-        my $value = $2;
+        my $attribute = $_[0]->_unescape($1);
+        my $value = $_[0]->_unescape($2);
         sub {
           ! ($_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} eq $value);
@@ -127,12 +128,12 @@ sub _raw_parse_simple_selector {
     # '[attr]' - match attribute being present:
     /\G\[$sel_re\]/gc and
       return do {
-        my $attribute = $1;
+        my $attribute = $_[0]->_unescape($1);
         sub {
           exists $_[0]->{attrs}{$attribute};
         }
     };
-    
+
     # none of the above matched, try catching some obvious errors:
 
     # indicate unmatched square bracket:
@@ -191,6 +192,11 @@ sub parse_selector {
   }
 }
 
+sub _unescape {
+    my ($self, $escaped) = @_;
+    (my $unescaped = $escaped) =~ s/\\([\Q$sel_meta_char\E])/$1/g;
+    return $unescaped;
+}
 
 sub _blam {
   my ($self, $error) = @_;

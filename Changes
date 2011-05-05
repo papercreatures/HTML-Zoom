@@ -1,4 +1,5 @@
 TBA
+  - Perforce escaping of meta-characters in selectors and test (rafl)
   - New Feature:  HTML::Zoom will autoload FilterBuilder functions so that
     you can avoid a bit of boilerplate in method calls.  Now you can replace:
 

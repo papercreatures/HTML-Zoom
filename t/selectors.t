@@ -31,6 +31,15 @@ is( HTML::Zoom->from_html('<div class="yo"></div>'.$stub)
    '<div class="yo">grg</div>'.$stub,
    'E.class works' );
 
+
+# el.class\.1
+is( HTML::Zoom->from_html('<div class="yo.yo"></div>'.$stub)
+   ->select('div.yo\.yo')
+      ->replace_content('grg')
+   ->to_html,
+   '<div class="yo.yo">grg</div>'.$stub,
+   'E.class\.0 works' );
+
 # el[attr]
 is( HTML::Zoom->from_html('<div frew="yo"></div>'.$stub)
    ->select('div[frew]')
@@ -62,6 +71,14 @@ is( HTML::Zoom->from_html('<div frew="yo"></div>'.$stub)
     ->to_html,
     '<div frew="yo">grg</div>'.$stub,
     'E[attr=val] works' );
+
+# el[attr=foo\.bar]
+is( HTML::Zoom->from_html('<div frew="yo.yo"></div>'.$stub)
+    ->select('div[frew=yo\.yo]')
+    ->replace_content('grg')
+    ->to_html,
+    '<div frew="yo.yo">grg</div>'.$stub,
+    'E[attr=foo\.bar] works' );
 
 # el[attr!="foo"]
 is( HTML::Zoom->from_html('<div f="f"></div><div class="quux"></div>'.$stub)
