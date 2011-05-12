@@ -13,7 +13,7 @@ TBA
     better, improved the docs and added tests for documented functions to
     avoid future regressions.
 
-  - add / to excluded characters in attribute names to correctly parse <br/> 
+  - add / to excluded characters in attribute names to correctly parse <br/>
   - add transform_attribute method (rbuels)
 
 0.009004 2011-02-14
@@ -28,7 +28,7 @@ TBA
 
 0.009002 2010-10-12
 
-  - Added support for more selector syntax support including: 
+  - Added support for more selector syntax support including:
       element#id
       element.class
       element[attr=foo]
