@@ -155,7 +155,19 @@ sub AUTOLOAD {
   my $sel = $self->select($selector);
   my $meth = our $AUTOLOAD;
   $meth =~ s/.*:://;
-  if(my $cr = $sel->_zconfig->filter_builder->can($meth)) {
+  if (ref($selector) eq 'HASH') {
+    my $ret = $self;
+    $ret = $ret->_do($_, $meth, @{$selector->{$_}}) for keys %$selector;
+    $ret;
+  } else {
+    $self->_do($selector, $meth, @args);
+  }
+}
+
+sub _do {
+  my ($self, $selector, $meth, @args) = @_;
+  my $sel = $self->select($selector);
+  if( my $cr = $sel->_zconfig->filter_builder->can($meth)) {
     return $sel->$meth(@args);
   } else {
     die "We can't do $meth on ->select('$selector')";
@@ -754,7 +766,7 @@ Oliver Charles
 
 Jakub Nareski
 
-Simon Elliot
+Simon Elliott
 
 Joe Highton
 

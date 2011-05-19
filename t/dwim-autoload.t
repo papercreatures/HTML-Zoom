@@ -322,4 +322,15 @@ sub code_stream (&) {
     'Got correct from repeat_content';
 }
 
+{
+  ok my $dwim = HTML::Zoom
+    ->from_html(q[<ul><li class="foo"></li><li class="bar"></li></ul>])
+    ->replace_content({
+      'li.foo' => ['foo'],
+      'li.bar' => ['bar'],
+    })->to_html;
+  is $dwim, '<ul><li class="foo">foo</li><li class="bar">bar</li></ul>',
+    'Multiple selectors from hashref';
+}
+
 done_testing;
