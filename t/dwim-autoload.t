@@ -330,7 +330,18 @@ sub code_stream (&) {
       'li.bar' => ['bar'],
     })->to_html;
   is $dwim, '<ul><li class="foo">foo</li><li class="bar">bar</li></ul>',
-    'Multiple selectors from hashref';
+    'Multiple selectors from hashref (via replace_content)';
+}
+
+{
+  ok my $dwim = HTML::Zoom
+  ->from_html(q[<ul><li class="foo"></li><li class="bar"></li></ul>])
+    ->set_attribute({
+      'li.foo' => [ class => 'baz' ],
+      'li.bar' => [ class => 'qux' ],
+    })->to_html;
+  is $dwim, '<ul><li class="baz"></li><li class="qux"></li></ul>',
+    'Multiple selectors from hashref (via set_attribute)';
 }
 
 done_testing;
