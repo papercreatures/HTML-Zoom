@@ -24,6 +24,8 @@ sub _flatten_stream_of_streams {
   shift->_zconfig->stream_utils->flatten_stream_of_streams(@_)
 }
 
+sub set_attr { shift->set_attribute(@_); }
+
 sub set_attribute {
   my $self = shift;
   my ($name, $value) = $self->_parse_attribute_args(@_);
@@ -50,6 +52,14 @@ sub _parse_attribute_args {
 sub add_attribute {
     die "renamed to add_to_attribute. killing this entirely for 1.0";
 }
+
+sub add_class { shift->add_to_attribute('class',@_) }
+
+sub remove_class { shift->remove_attribute('class',@_) }
+
+sub set_class { shift->set_attribute('class',@_) }
+
+sub set_id { shift->set_attribute('id',@_) }
 
 sub add_to_attribute {
   my $self = shift;

@@ -55,6 +55,14 @@ is(
   'set attribute on existing attribute'
 );
 
+($expect = $tmpl) =~ s/class="main"/class="foo"/;
+
+is(
+  run_for { $_->set_attr({ name => 'class', value => 'foo' }) },
+  $expect,
+  'set attribute on existing attribute (shorthand)'
+);
+
 ($expect = $tmpl) =~ s/class="main"/class="main" foo="bar"/;
 
 is(
@@ -69,6 +77,22 @@ is(
   run_for { $_->add_to_attribute({ name => 'class', value => 'foo' }) },
   $expect,
   'add attribute on existing attribute'
+);
+
+($expect = $tmpl) =~ s/class="main"/class="main foo"/;
+
+is(
+  run_for { $_->add_class('foo') },
+  $expect,
+  'add attribute on existing attribute (shorthand)'
+);
+
+($expect = $tmpl) =~ s/class="main"/class="main" id="foo"/;
+
+is(
+  run_for { $_->set_id('foo') },
+  $expect,
+  'set_id (shorthand)'
 );
 
 ($expect = $tmpl) =~ s/class="main"/class="main" foo="bar"/;
