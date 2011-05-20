@@ -105,4 +105,6 @@ sub AUTOLOAD {
   return $self = $self->select($selector)->$meth(@args);
 }
 
+sub DESTROY {}
+  
 1;

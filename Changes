@@ -1,3 +1,6 @@
+0.009006
+  - Add DESTROY method to fix test failures / warnings in perl >= 5.13.1
+
 0.009005 2011-05-12
 
   - Perforce escaping of meta-characters in selectors and test (rafl)

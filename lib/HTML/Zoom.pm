@@ -162,6 +162,8 @@ sub AUTOLOAD {
   }
 }
 
+sub DESTROY {}
+
 1;
 
 =head1 NAME
