@@ -46,7 +46,7 @@ sub _parse_attribute_args {
   # allow ->add_to_attribute(name => 'value')
   #    or ->add_to_attribute({ name => 'name', value => 'value' })
 
-  warn "WARNING: Long form args (name => 'class', value => 'x') will be replaced with an incompatible form in the *very near future*."
+  die "WARNING: Long form arg (name => 'class', value => 'x') is deprecated"
     if(@_ == 1 && $_[0]->{'name'} && $_[0]->{'value'});
   my ($name, $value) = @_ > 1 ? @_ : @{$_[0]}{qw(name value)};
   return ($name, $self->_zconfig->parser->html_escape($value));
