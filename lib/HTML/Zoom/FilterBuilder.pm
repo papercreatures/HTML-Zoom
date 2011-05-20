@@ -460,7 +460,7 @@ Sets an attribute of a given name to a given value for all matching selections.
       ->select('p')
       ->set_attribute(class=>'paragraph')
       ->select('div')
-      ->set_attribute({name=>'class', value=>'divider'});
+      ->set_attribute({class=>'paragraph', name=>'divider'});
 
 Overrides existing values, if such exist.  When multiple L</set_attribute>
 calls are made against the same or overlapping selection sets, the final

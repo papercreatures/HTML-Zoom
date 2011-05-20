@@ -213,13 +213,14 @@ HTML::Zoom - selector based streaming template engine
             $_->select('.name')->replace_content('Matt')
               ->select('.age')->replace_content('26')
           },
+          # alternate form
           sub {
-            $_->select('.name')->replace_content('Mark')
-              ->select('.age')->replace_content('0x29')
+            $_->replace_content({'.name' => ['Mark'],'.age' => ['0x29'] })
           },
+          #alternate alternate form
           sub {
-            $_->select('.name')->replace_content('Epitaph')
-              ->select('.age')->replace_content('<redacted>')
+            $_->replace_content('.name' => 'Epitaph')
+              ->replace_content('.age' => '<redacted>')
           },
         ],
         { repeat_between => '.between' }
@@ -342,14 +343,12 @@ cleanly:
        ->add_to_attribute( for => $field->{id} )
        ->then
        ->replace_content( $field->{label} )
-
-       ->select('input')
-       ->add_to_attribute( name => $field->{name} )
-       ->then
-       ->add_to_attribute( type => $field->{type} )
-       ->then
-       ->add_to_attribute( value => $field->{value} )
-
+       ->add_to_attribute(
+        input => { 
+         name => $field->{name},
+         type => $field->{type},
+         value => $field->{value}
+       })
     } } @fields
   ]);
 
