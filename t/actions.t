@@ -9,7 +9,7 @@ use HTML::Zoom::FilterStream;
 
 my $tmpl = <<END;
 <body>
-  <div class="main">
+  <div name="cow" class="main">
     <span class="hilight name">Bob</span>
     <span class="career">Builder</span>
     <hr />
@@ -50,15 +50,23 @@ my ($expect, @ev);
 ($expect = $tmpl) =~ s/class="main"/class="foo"/;
 
 is(
-  run_for { $_->set_attribute({ name => 'class', value => 'foo' }) },
+  run_for { $_->set_attribute( 'class' => 'foo' ) },
   $expect,
   'set attribute on existing attribute'
+);
+
+($expect = $tmpl) =~ s/name="cow" class="main"/name="bar" class="foo"/;
+
+is(
+  run_for { $_->set_attribute({ 'class' => 'foo', 'name' => 'bar'}) },
+  $expect,
+  'set attributes using hashref form'
 );
 
 ($expect = $tmpl) =~ s/class="main"/class="main" foo="bar"/;
 
 is(
-  run_for { $_->set_attribute({ name => 'foo', value => 'bar' }) },
+  run_for { $_->set_attribute( 'foo' => 'bar' ) },
   $expect,
   'set attribute on non existing attribute'
 );
@@ -66,7 +74,7 @@ is(
 ($expect = $tmpl) =~ s/class="main"/class="main foo"/;
 
 is(
-  run_for { $_->add_to_attribute({ name => 'class', value => 'foo' }) },
+  run_for { $_->add_to_attribute( 'class' => 'foo' ) },
   $expect,
   'add attribute on existing attribute'
 );
@@ -74,7 +82,7 @@ is(
 ($expect = $tmpl) =~ s/class="main"/class="main" foo="bar"/;
 
 is(
-  run_for { $_->add_to_attribute({ name => 'foo', value => 'bar' }) },
+  run_for { $_->add_to_attribute( 'foo' => 'bar' ) },
   $expect,
   'add attribute on non existing attribute'
 );
@@ -207,7 +215,7 @@ is(
 
 is(
   HTML::Zoom::Producer::BuiltIn->html_from_events(\@ev),
-  '<div class="main">
+  '<div name="cow" class="main">
     <span class="hilight name">Bob</span>
     <span class="career">Builder</span>
     <hr />
@@ -220,7 +228,7 @@ is(
 is(
   run_for { $_->collect({ into => \@ev, content => 1 }) },
   '<body>
-  <div class="main"></div>
+  <div name="cow" class="main"></div>
 </body>
 ',
   'collect w/content removes correctly'
@@ -239,7 +247,7 @@ is(
 is(
   run_for { $_->replace($ohai, { content => 1 }) },
   '<body>
-  <div class="main">O HAI</div>
+  <div name="cow" class="main">O HAI</div>
 </body>
 ',
   'replace w/content'
@@ -273,11 +281,11 @@ is(
     )
   },
   q{<body>
-  <div class="main">
+  <div name="cow" class="main">
     <span class="hilight name">mst</span>
     <span class="career">Chainsaw Wielder</span>
     <hr />
-  </div><div class="main">
+  </div><div name="cow" class="main">
     <span class="hilight name">mdk</span>
     <span class="career">Adminion</span>
     <hr />
@@ -305,7 +313,7 @@ is(
     )
   },
   q{<body>
-  <div class="main">
+  <div name="cow" class="main">
     <span class="hilight name">mst</span>
     <span class="career">Chainsaw Wielder</span>
     <hr />
@@ -345,7 +353,7 @@ is(
     )
   },
   q{<body>
-  <div class="main">
+  <div name="cow" class="main">
     <span class="hilight name">mst</span>
     <span class="career">Chainsaw Wielder</span>
     <hr />
@@ -378,7 +386,7 @@ is(
     )
   },
   q{<body>
-  <div class="main">
+  <div name="cow" class="main">
     <span class="hilight name">mst</span>
     <span class="career">Chainsaw Wielder</span>
     <hr />

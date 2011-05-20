@@ -24,47 +24,57 @@ sub _flatten_stream_of_streams {
   shift->_zconfig->stream_utils->flatten_stream_of_streams(@_)
 }
 
+sub set_attr { shift->set_attribute(@_); }
+
 sub set_attribute {
   my $self = shift;
-  my ($name, $value) = $self->_parse_attribute_args(@_);
+  my $attr = $self->_parse_attribute_args(@_);
   sub {
     my $a = (my $evt = $_[0])->{attrs};
-    my $e = exists $a->{$name};
+    my @kadd = grep {!exists $a->{$_}} keys %$attr;
     +{ %$evt, raw => undef, raw_attrs => undef,
-       attrs => { %$a, $name => $value },
-      ($e # add to name list if not present
-        ? ()
-        : (attr_names => [ @{$evt->{attr_names}}, $name ]))
+       attrs => { %$a, %$attr },
+       @kadd ? (attr_names => [ @{$evt->{attr_names}}, @kadd ]) : ()
      }
    };
 }
 
 sub _parse_attribute_args {
   my $self = shift;
-  # allow ->add_to_attribute(name => 'value')
-  #    or ->add_to_attribute({ name => 'name', value => 'value' })
-  my ($name, $value) = @_ > 1 ? @_ : @{$_[0]}{qw(name value)};
-  return ($name, $self->_zconfig->parser->html_escape($value));
+
+  warn "WARNING: Long form arg (name => 'class', value => 'x') is deprecated. This may not do what you originally intended..."
+    if(@_ == 1 && $_[0]->{'name'} && $_[0]->{'value'});
+    
+  my $opts = ref($_[0]) eq 'HASH' ? $_[0] : {$_[0] => $_[1]};
+  for (values %{$opts}) { $self->_zconfig->parser->html_escape($_); }
+  return $opts;
 }
 
 sub add_attribute {
     die "renamed to add_to_attribute. killing this entirely for 1.0";
 }
 
+sub add_class { shift->add_to_attribute('class',@_) }
+
+sub remove_class { shift->remove_attribute('class',@_) }
+
+sub set_class { shift->set_attribute('class',@_) }
+
+sub set_id { shift->set_attribute('id',@_) }
+
 sub add_to_attribute {
   my $self = shift;
-  my ($name, $value) = $self->_parse_attribute_args(@_);
+  my $attr = $self->_parse_attribute_args(@_);
   sub {
     my $a = (my $evt = $_[0])->{attrs};
-    my $e = exists $a->{$name};
+    my @kadd = grep {!exists $a->{$_}} keys %$attr;
     +{ %$evt, raw => undef, raw_attrs => undef,
        attrs => {
          %$a,
-         $name => join(' ', ($e ? $a->{$name} : ()), $value)
+         map {$_ => join(' ', (exists $a->{$_} ? $a->{$_} : ()), $attr->{$_}) } 
+          keys %$attr
       },
-      ($e # add to name list if not present
-        ? ()
-        : (attr_names => [ @{$evt->{attr_names}}, $name ]))
+      @kadd ? (attr_names => [ @{$evt->{attr_names}}, @kadd ]) : ()
     }
   };
 }
