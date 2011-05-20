@@ -117,4 +117,6 @@ sub _do {
   return $self->select($selector)->$meth(@args);
 }
 
+sub DESTROY {}
+
 1;

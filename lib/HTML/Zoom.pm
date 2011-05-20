@@ -174,6 +174,8 @@ sub _do {
   }
 }
 
+sub DESTROY {}
+
 1;
 
 =head1 NAME
