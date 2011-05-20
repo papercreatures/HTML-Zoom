@@ -24,6 +24,8 @@ sub _flatten_stream_of_streams {
   shift->_zconfig->stream_utils->flatten_stream_of_streams(@_)
 }
 
+sub set_attr { shift->set_attribute(@_); }
+
 sub set_attribute {
   my $self = shift;
   my ($name, $value) = $self->_parse_attribute_args(@_);
@@ -43,6 +45,9 @@ sub _parse_attribute_args {
   my $self = shift;
   # allow ->add_to_attribute(name => 'value')
   #    or ->add_to_attribute({ name => 'name', value => 'value' })
+
+  warn "WARNING: Long form args (name => 'class', value => 'x') will be replaced with an incompatible form in the *very near future*."
+    if(@_ == 1 && $_[0]->{'name'} && $_[0]->{'value'});
   my ($name, $value) = @_ > 1 ? @_ : @{$_[0]}{qw(name value)};
   return ($name, $self->_zconfig->parser->html_escape($value));
 }
@@ -50,6 +55,14 @@ sub _parse_attribute_args {
 sub add_attribute {
     die "renamed to add_to_attribute. killing this entirely for 1.0";
 }
+
+sub add_class { shift->add_to_attribute('class',@_) }
+
+sub remove_class { shift->remove_attribute('class',@_) }
+
+sub set_class { shift->set_attribute('class',@_) }
+
+sub set_id { shift->set_attribute('id',@_) }
 
 sub add_to_attribute {
   my $self = shift;
