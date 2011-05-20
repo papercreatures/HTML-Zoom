@@ -462,7 +462,6 @@ Sets an attribute of a given name to a given value for all matching selections.
       ->select('div')
       ->set_attribute({name=>'class', value=>'divider'});
 
-
 Overrides existing values, if such exist.  When multiple L</set_attribute>
 calls are made against the same or overlapping selection sets, the final
 call wins.
@@ -472,19 +471,9 @@ call wins.
 Adds a value to an existing attribute, or creates one if the attribute does not
 yet exist.  You may call this method with either an Array or HashRef of Args.
 
-Here's the 'long form' HashRef:
-
     $html_zoom
       ->select('p')
-      ->set_attribute(class=>'paragraph')
-      ->then
-      ->add_to_attribute({name=>'class', value=>'divider'});
-
-And the exact same effect using the 'short form' Array:
-
-    $html_zoom
-      ->select('p')
-      ->set_attribute(class=>'paragraph')
+      ->set_attribute({class => 'paragraph', name => 'test'})
       ->then
       ->add_to_attribute(class=>'divider');
 
