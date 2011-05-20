@@ -330,7 +330,7 @@ sub code_stream (&) {
       'li.bar' => ['bar'],
     })->to_html;
   is $dwim, '<ul><li class="foo">foo</li><li class="bar">bar</li></ul>',
-    'Multiple selectors from hashref (via replace_content)';
+    'Hashref selectors (via replace_content)';
 }
 
 {
@@ -341,7 +341,23 @@ sub code_stream (&) {
       'li.bar' => [ class => 'qux' ],
     })->to_html;
   is $dwim, '<ul><li class="baz"></li><li class="qux"></li></ul>',
-    'Multiple selectors from hashref (via set_attribute)';
+    'Hashref selectors (via set_attribute)';
+}
+
+{
+  ok my $dwim = HTML::Zoom
+  ->from_html(q[<ul><li class="foo"></li><li class="bar"></li></ul>])
+  ->select('ul')->collect({ 
+  passthrough => 1,
+  filter => sub {
+      $_->set_attribute({
+        'li.foo' => [ class => 'baz' ],
+        'li.bar' => [ class => 'qux' ],
+      });
+    }
+  })->to_html;
+  is $dwim, '<ul><li class="baz"></li><li class="qux"></li></ul>',
+    'Hashref selectors on codestream';
 }
 
 done_testing;
