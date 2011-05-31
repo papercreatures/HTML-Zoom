@@ -632,6 +632,12 @@ zoom instance with that as the source HTML to be transformed.
 
 Convenience method - slurps the contents of $file and calls from_html with it.
 
+=head2 from_events
+
+  my $zoom = HTML::Zoom->from_events($evt);
+
+Create a new Zoom object from collected events
+
 =head2 to_stream
 
   my $stream = $zoom->to_stream;
