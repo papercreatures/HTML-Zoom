@@ -125,6 +125,20 @@ is(
   'remove name from attribute'
 );
 
+is(
+  run_for { $_->remove_from_attribute({ madeup => 'main' }) },
+  $tmpl,
+  'remove name from non existing attribute (ignored)'
+);
+
+($expect = $tmpl) =~ s/class="main"/class=""/;
+
+is(
+  run_for { $_->remove_class( 'main' ) },
+  $expect,
+  'remove_class'
+);
+
 ($expect = $tmpl) =~ s/ class="main"//;
 
 is(

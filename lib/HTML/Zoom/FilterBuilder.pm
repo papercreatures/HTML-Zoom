@@ -83,13 +83,15 @@ sub remove_from_attribute {
   my $self = shift;
   my $attr = $self->_parse_attribute_args(@_);
   sub {
+
     my $a = (my $evt = $_[0])->{attrs};
+    my @kupd = grep {exists $a->{$_}} keys %$attr;
     +{ %$evt, raw => undef, raw_attrs => undef,
        attrs => {
          %$a,
          #TODO needs to support multiple removes
          map { my $tar = $_; $_ => join ' ', 
-          map {$attr->{$tar} ne $_} split ' ', $a->{$_} } keys %$attr
+          map {$attr->{$tar} ne $_} split ' ', $a->{$_} } @kupd
       },
     }
   };
