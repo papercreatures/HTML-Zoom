@@ -58,9 +58,9 @@ is(
 ($expect = $tmpl) =~ s/name="cow" class="main"/name="bar" class="foo"/;
 
 is(
-  run_for { $_->set_attribute({ 'class' => 'foo', 'name' => 'bar'}) },
+  run_for { $_->set_attr({ 'class' => 'foo', 'name' => 'bar'}) },
   $expect,
-  'set attributes using hashref form'
+  'set attributes using hashref form (shorthand)'
 );
 
 ($expect = $tmpl) =~ s/class="main"/class="main" foo="bar"/;
@@ -115,6 +115,14 @@ is(
   run_for { $_->remove_attribute({ name => 'foo' }) },
   $tmpl,
   'remove attribute on non existing attribute'
+);
+
+($expect = $tmpl) =~ s/class="main"/class=""/;
+
+is(
+  run_for { $_->remove_from_attribute({ class => 'main' }) },
+  $expect,
+  'remove name from attribute'
 );
 
 ($expect = $tmpl) =~ s/ class="main"//;

@@ -56,7 +56,7 @@ sub add_attribute {
 
 sub add_class { shift->add_to_attribute('class',@_) }
 
-sub remove_class { shift->remove_attribute('class',@_) }
+sub remove_class { shift->remove_from_attribute('class',@_) }
 
 sub set_class { shift->set_attribute('class',@_) }
 
@@ -75,6 +75,22 @@ sub add_to_attribute {
           keys %$attr
       },
       @kadd ? (attr_names => [ @{$evt->{attr_names}}, @kadd ]) : ()
+    }
+  };
+}
+
+sub remove_from_attribute {
+  my $self = shift;
+  my $attr = $self->_parse_attribute_args(@_);
+  sub {
+    my $a = (my $evt = $_[0])->{attrs};
+    +{ %$evt, raw => undef, raw_attrs => undef,
+       attrs => {
+         %$a,
+         #TODO needs to support multiple removes
+         map { my $tar = $_; $_ => join ' ', 
+          map {$attr->{$tar} ne $_} split ' ', $a->{$_} } keys %$attr
+      },
     }
   };
 }
@@ -489,7 +505,25 @@ Removes an attribute and all its values.
       ->then
       ->remove_attribute('class');
 
+=head2 remove_from_attribute
+
+Removes a value from existing attribute
+
+    $html_zoom
+      ->select('p')
+      ->set_attribute(class=>'paragraph lead')
+      ->then
+      ->remove_from_attribute('class' => 'lead');
+
 Removes attributes from the original stream or events already added.
+
+=head2 add_class
+
+Add to a class attribute
+
+=head2 remove_class
+
+Remove from a class attribute
 
 =head2 transform_attribute
 
