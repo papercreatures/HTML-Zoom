@@ -1,5 +1,5 @@
 use strictures 1;
-use Test::More;
+use Test::More skip_all => 'TODO test';
 
 use HTML::Zoom;
 
