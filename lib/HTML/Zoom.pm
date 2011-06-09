@@ -686,6 +686,14 @@ sugar, the following is entirely equivalent:
 
   my $z2 = $sub->($z1);
 
+=head2 apply_if
+
+  my $z2 = $z1->apply_if($cond, sub {
+    $_->select('div')->replace_content('I AM A DIV!') })
+  });
+
+->apply but will only run the tranform if $cond is true
+
 =head2 to_html
 
   my $html = $zoom->to_html;
