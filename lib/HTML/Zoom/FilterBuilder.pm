@@ -366,6 +366,45 @@ sub repeat_content {
   $self->repeat($repeat_for, { %{$options||{}}, content => 1 })
 }
 
+sub extract_names {
+  my ($self, $to) = @_;
+  sub {
+    my ($evt) = @_;
+    push @$to, $evt->{'attrs'}->{'name'};
+    $evt;
+  }
+};
+
+sub validate_form {
+  my ($self,$to,$fill) = @_;
+  $self->collect({ 
+    filter => sub {
+      return 
+        $_->select('input')->validate_and_fill($to,$fill)
+        ->select('select')->validate_and_fill($to,$fill);
+    },
+    passthrough => 1,
+  });
+}
+
+sub validate_and_fill {
+  my ($self, $to, $fill) = @_;
+  sub {
+    my ($evt) = @_;
+    my $nm = $evt->{'attrs'}->{'name'};
+    if(defined $fill && $fill->{$nm}) {
+      $evt->{'raw'} = undef;
+      $evt->{'raw_attrs'} = undef;
+      push @{$evt->{'attr_names'}}, 'value' unless exists $evt->{'attrs'}->{'value'};
+      $evt->{'attrs'}->{'value'} = $fill->{$nm};
+    }
+    $to->{$nm} = 
+      [split ' ', $evt->{'attrs'}->{'data-validate'}||""];
+    $evt;
+  }
+}
+
+
 1;
 
 =head1 NAME
