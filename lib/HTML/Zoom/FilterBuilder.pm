@@ -42,9 +42,6 @@ sub set_attribute {
 sub _parse_attribute_args {
   my $self = shift;
 
-  warn "WARNING: Long form arg (name => 'class', value => 'x') is deprecated. This may not do what you originally intended..."
-    if(@_ == 1 && $_[0]->{'name'} && $_[0]->{'value'});
-    
   my $opts = ref($_[0]) eq 'HASH' ? $_[0] : {$_[0] => $_[1]};
   for (values %{$opts}) { $self->_zconfig->parser->html_escape($_); }
   return $opts;
@@ -385,6 +382,15 @@ sub validate_form {
     },
     passthrough => 1,
   });
+}
+
+sub val {
+  my ($self, $value) = @_;
+  #set value on an element. if its a select select its option
+  #if it's a checkbox check it otherwise set attr value
+  sub {
+    return $self->set_attribute(value => $value);
+  }
 }
 
 sub validate_and_fill {

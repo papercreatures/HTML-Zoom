@@ -1,5 +1,6 @@
 use strictures 1;
 use Test::More;
+use Test::More;
 
 use HTML::Zoom;
 
@@ -35,13 +36,31 @@ END
 
 my $z = HTML::Zoom->from_html($tmpl);
 
-my %rules;
-my $validate_and_fill = sub {
- $_ = $_->set_attribute("test" => "test");
- #use Devel::Dwarn;Dwarn \@_;
- $_;
-};
+my ($expect);
 
-print $z->select('form')->validate_form(\%rules, {input_field => "Test", input_field2 => "Moo"})->to_html;
-use Devel::Dwarn;Dwarn \%rules;
+($expect = $tmpl) =~ s/name="input_field" /name="input_field" value="testval" /;
+
+is(
+  $z->select('input[name="input_field"]')->val('testval')->to_html,
+  $expect,
+  'set value on input=text'
+);
+
+($expect = $tmpl) =~ s/name="input_field" /name="input_field" value="testval" /;
+
+is(
+  $z->select('input[name="input_check"]')->val(1)->to_html,
+  $expect,
+  'set value on input=checkbox'
+);
+
+# my %rules;
+# my $validate_and_fill = sub {
+#  $_ = $_->set_attribute("test" => "test");
+#  #use Devel::Dwarn;Dwarn \@_;
+#  $_;
+# };
+# 
+# print $z->select('form')->validate_form(\%rules, {input_field => "Test", input_field2 => "Moo"})->to_html;
+# use Devel::Dwarn;Dwarn \%rules;
 
