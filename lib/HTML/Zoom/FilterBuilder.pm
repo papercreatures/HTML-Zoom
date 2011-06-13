@@ -373,39 +373,69 @@ sub extract_names {
 };
 
 sub validate_form {
-  my ($self,$to,$fill) = @_;
+  my ($self,$to) = @_;
   $self->collect({ 
     filter => sub {
       return 
-        $_->select('input')->validate_and_fill($to,$fill)
-        ->select('select')->validate_and_fill($to,$fill);
+        $_->select('input')->validation_rules($to)
+        ->select('select')->validation_rules($to);
     },
     passthrough => 1,
   });
 }
 
-sub val {
-  my ($self, $value) = @_;
-  #set value on an element. if its a select select its option
-  #if it's a checkbox check it otherwise set attr value
+sub fill_form {
+  my ($self,$val) = @_;
+  $self->collect({ 
+    filter => sub {
+      return 
+        $_->select('input')->val($val)
+        #->select('select')->val($val)
+        ;
+    },
+    passthrough => 1,
+  });
+}
+
+sub validation_rules {
+  my ($self, $to) = @_;
   sub {
-    return $self->set_attribute(value => $value);
+    my ($evt) = @_;
+    $to->{$evt->{'attrs'}->{'name'}} 
+      = [split ' ', $evt->{'attrs'}->{'data-validate'}||""];
+    $evt;
   }
 }
 
-sub validate_and_fill {
-  my ($self, $to, $fill) = @_;
+sub val {
+  #if val is a hashref automatically match to name, otherwise fill as is.
+  my ($self, $val) = @_;
   sub {
     my ($evt) = @_;
-    my $nm = $evt->{'attrs'}->{'name'};
-    if(defined $fill && $fill->{$nm}) {
-      $evt->{'raw'} = undef;
-      $evt->{'raw_attrs'} = undef;
-      push @{$evt->{'attr_names'}}, 'value' unless exists $evt->{'attrs'}->{'value'};
-      $evt->{'attrs'}->{'value'} = $fill->{$nm};
+    my $attrs = $evt->{'attrs'};
+    my $nm = $attrs->{'name'};
+    my $tar = defined $val && ref $val eq 'HASH' ? $val->{$nm} : $val;
+    if(defined $tar) {
+      if($evt->{'name'} eq 'select') {
+        #if we are select do something more complicated
+        warn "Can't do selects yet";
+      } else {
+        $evt->{'raw'} = undef;
+        $evt->{'raw_attrs'} = undef;
+        push @{$evt->{'attr_names'}}, 'value' unless exists $attrs->{'value'};
+        $attrs->{'value'} = $tar;
+        #check if we are a checkbox
+        if($attrs->{'type'} eq 'checkbox') {
+          if($tar) {
+            push @{$evt->{'attr_names'}}, 'selected' unless exists $attrs->{'selected'};
+            $attrs->{'selected'} = $tar ? 'selected' : '';
+          } else {
+            delete $attrs->{'selected'};
+            $evt->{'attr_names'} = [ grep $_ ne 'selected', @{$evt->{'attr_names'}} ];
+          }
+        }
+      }
     }
-    $to->{$nm} = 
-      [split ' ', $evt->{'attrs'}->{'data-validate'}||""];
     $evt;
   }
 }

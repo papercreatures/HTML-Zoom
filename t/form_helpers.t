@@ -46,7 +46,8 @@ is(
   'set value on input=text'
 );
 
-($expect = $tmpl) =~ s/name="input_field" /name="input_field" value="testval" /;
+$z = HTML::Zoom->from_html($tmpl);
+($expect = $tmpl) =~ s/value="0" type="checkbox" name="input_check" /value="1" type="checkbox" name="input_check" selected="selected" /;
 
 is(
   $z->select('input[name="input_check"]')->val(1)->to_html,
@@ -54,13 +55,39 @@ is(
   'set value on input=checkbox'
 );
 
-# my %rules;
-# my $validate_and_fill = sub {
-#  $_ = $_->set_attribute("test" => "test");
-#  #use Devel::Dwarn;Dwarn \@_;
-#  $_;
-# };
-# 
-# print $z->select('form')->validate_form(\%rules, {input_field => "Test", input_field2 => "Moo"})->to_html;
-# use Devel::Dwarn;Dwarn \%rules;
+($expect = $tmpl) =~ s/value="1" type="checkbox" name="input_check" selected="selected" \>/value="0" type="checkbox" name="input_check" \>/;
 
+is(
+  $z->select('input[name="input_check"]')->val(0)->to_html,
+  $expect,
+  'remove value on input=checkbox'
+);
+
+$z = HTML::Zoom->from_html($tmpl);
+($expect = $tmpl) =~ s/name="input_field" /name="input_field" value="testval" /;
+
+is(
+  $z->select('input')->val({input_field => "testval"})->to_html,
+  $expect,
+  'alternate fill'
+);
+
+
+SKIP: {
+  skip "not implemented",1;
+  $z = HTML::Zoom->from_html($tmpl);
+  ($expect = $tmpl) =~ s/option value="2" /option value="2" selected="selected" /;
+
+  is(
+    $z->select('select[name="select_field"]')->val(2)->to_html,
+    $expect,
+    'Set value on select'
+  );
+  
+}
+
+my %rules;
+$z->select('form')->validate_form(\%rules)->to_html;
+is(scalar keys %rules, 5, "Correctly extracted validation info");
+
+done_testing();
