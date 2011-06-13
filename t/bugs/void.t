@@ -16,6 +16,15 @@ my $tmpl2 = <<END;
 END
 
 my $z = HTML::Zoom->from_html($tmpl);
+
+my $count = 0;
+$z->select('input')->collect({
+  filter => sub { $count++; $_ },
+  passthrough => 1,
+})->run;
+
+is($count, 1,"collect on void");
+
 is(
   $z->select('input')
   ->add_before(\"<div>cluck</div>")
