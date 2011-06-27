@@ -72,6 +72,17 @@ is( HTML::Zoom->from_html('<div frew="yo"></div>'.$stub)
     '<div frew="yo">grg</div>'.$stub,
     'E[attr=val] works' );
 
+{
+    local $TODO = 'mixed-case attribute names are broken';
+    # el[Attr=foo]
+    is( HTML::Zoom->from_html('<div FreW="yo"></div>'.$stub)
+        ->select('div[FreW=yo]')
+        ->replace_content('grg')
+        ->to_html,
+        '<div FreW="yo">grg</div>'.$stub,
+        'E[attr=val] works with mixed-case attribute names' );
+}
+
 # el[attr=foo\.bar]
 is( HTML::Zoom->from_html('<div frew="yo.yo"></div>'.$stub)
     ->select('div[frew=yo\.yo]')
