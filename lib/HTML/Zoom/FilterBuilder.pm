@@ -425,7 +425,7 @@ sub val {
         push @{$evt->{'attr_names'}}, 'value' unless exists $attrs->{'value'};
         $attrs->{'value'} = $tar;
         #check if we are a checkbox
-        if($attrs->{'type'} eq 'checkbox') {
+        if(exists $attrs->{'type'} && $attrs->{'type'} eq 'checkbox') {
           if($tar) {
             push @{$evt->{'attr_names'}}, 'selected' unless exists $attrs->{'selected'};
             $attrs->{'selected'} = $tar ? 'selected' : '';
