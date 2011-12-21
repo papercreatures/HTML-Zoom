@@ -778,6 +778,8 @@ John Napiorkowski
 
 Robert Buels
 
+David Dorward
+
 =head1 COPYRIGHT
 
 Copyright (c) 2010-2011 the HTML::Zoom L</AUTHOR> and L</CONTRIBUTORS>
