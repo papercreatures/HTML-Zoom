@@ -1,6 +1,6 @@
 use strictures 1;
 use HTML::Zoom;
-use Test::More ;# skip_all => "Totally doesn't work yet";
+use Test::More skip_all => "Totally doesn't work yet";
 
 # Test that contant of elements defined as containing intrinsic CDATA are not
 # selected as elements
