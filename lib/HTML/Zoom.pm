@@ -8,7 +8,7 @@ use HTML::Zoom::Transform;
 use HTML::Zoom::TransformBuilder;
 use Scalar::Util ();
 
-our $VERSION = '0.009005';
+our $VERSION = '0.009007_1';
 
 $VERSION = eval $VERSION;
 
@@ -643,6 +643,12 @@ zoom instance with that as the source HTML to be transformed.
 
 Convenience method - slurps the contents of $file and calls from_html with it.
 
+=head2 from_events
+
+  my $zoom = HTML::Zoom->from_events($evt);
+
+Create a new Zoom object from collected events
+
 =head2 to_stream
 
   my $stream = $zoom->to_stream;
@@ -690,6 +696,14 @@ sugar, the following is entirely equivalent:
   };
 
   my $z2 = $sub->($z1);
+
+=head2 apply_if
+
+  my $z2 = $z1->apply_if($cond, sub {
+    $_->select('div')->replace_content('I AM A DIV!') })
+  });
+
+->apply but will only run the tranform if $cond is true
 
 =head2 to_html
 
@@ -774,6 +788,8 @@ Joe Highton
 John Napiorkowski
 
 Robert Buels
+
+David Dorward
 
 =head1 COPYRIGHT
 
