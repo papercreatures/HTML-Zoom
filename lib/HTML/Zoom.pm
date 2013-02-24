@@ -770,7 +770,7 @@ Oliver Charles
 
 Jakub Nareski
 
-Simon Elliot
+Simon Elliott
 
 Joe Highton
 
