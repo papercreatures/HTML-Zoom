@@ -8,7 +8,7 @@ use HTML::Zoom::Transform;
 use HTML::Zoom::TransformBuilder;
 use Scalar::Util ();
 
-our $VERSION = '0.009008';
+our $VERSION = '0.009008_01';
 
 $VERSION = eval $VERSION;
 

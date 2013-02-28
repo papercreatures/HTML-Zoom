@@ -1,4 +1,7 @@
-0.009008 2013-02-28
+0.009008_01 2013-02-28
+
+  - remove_from_attribute and related helpers (remove_class, add_class)
+
   - Several patches for incorrect functionality (thanks to Jim Miner &
     stratman@gmail.com) :-
 
