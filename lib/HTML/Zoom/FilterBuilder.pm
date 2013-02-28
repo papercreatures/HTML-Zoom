@@ -43,8 +43,6 @@ sub set_attribute {
 
 sub _parse_attribute_args {
   my $self = shift;
-  # allow ->add_to_attribute(name => 'value')
-  #    or ->add_to_attribute({ name => 'name', value => 'value' })
 
   die "Long form arg (name => 'class', value => 'x') is no longer supported"
     if(@_ == 1 && $_[0]->{'name'} && $_[0]->{'value'});
