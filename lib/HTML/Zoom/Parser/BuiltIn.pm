@@ -18,6 +18,10 @@ sub html_to_stream {
 
 sub _hacky_tag_parser {
   my ($text, $handler) = @_;
+  $text =~ m{^([^<]*)}g;
+  if ( length $1 ) { # leading PCDATA
+      $handler->({ type => 'TEXT', raw => $1 });
+  }
   while (
     $text =~ m{
       (

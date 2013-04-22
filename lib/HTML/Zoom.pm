@@ -8,7 +8,7 @@ use HTML::Zoom::Transform;
 use HTML::Zoom::TransformBuilder;
 use Scalar::Util ();
 
-our $VERSION = '0.009005';
+our $VERSION = '0.009008_01';
 
 $VERSION = eval $VERSION;
 
@@ -788,6 +788,8 @@ Joe Highton
 John Napiorkowski
 
 Robert Buels
+
+David Dorward
 
 =head1 COPYRIGHT
 

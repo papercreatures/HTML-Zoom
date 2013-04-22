@@ -1,3 +1,26 @@
+0.009008_01 2013-02-28
+
+  - remove_from_attribute and related helpers (remove_class, add_class)
+
+  - Several patches for incorrect functionality (thanks to Jim Miner &
+    stratman@gmail.com) :-
+
+  - Don't throw away leading PCDATA in $text, in _hacky_tag_parser().
+    This is important so we can use from_html and replace_content to
+    insert fragments with or without markup into templates.
+
+  - Fix matching against attribute value "0" (zero) or "" (empty).
+
+  - Fix parsing of selectors matching against attribute value "" (empty).
+    (This does not fix parsing of single-quoted attribute values.)
+
+0.009007 2013-02-24
+  - Remove long form ( name, value ) for attributes to set_attribute / add_attribute
+    to allow future enhancements (selector in options).
+
+0.009006 2011-05-20
+  - Add DESTROY method to fix test failures / warnings in perl >= 5.13.1
+
 0.009005 2011-05-12
 
   - Perforce escaping of meta-characters in selectors and test (rafl)

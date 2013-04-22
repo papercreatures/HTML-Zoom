@@ -6,8 +6,9 @@ use Carp qw(confess);
 
 my $sel_char = '-\w_';
 my $sel_meta_char = q-!"#$%&'()*+,./:;<=>?@[\]^`{|}~-;
-my $sel_re = qr/((?:(?:\\[\Q$sel_meta_char\E])|[$sel_char])+)/;
-my $match_value_re = qr/"?$sel_re"?/;
+my $sel_item = qr/(?:(?:\\[\Q$sel_meta_char\E])|[$sel_char])/;
+my $sel_re = qr/($sel_item+)/;
+my $match_value_re = qr/"?($sel_item*)"?/;
 
 
 sub new { bless({}, shift) }
@@ -54,7 +55,7 @@ sub _raw_parse_simple_selector {
         my $attribute = $_[0]->_unescape($1);
         my $value = $_[0]->_unescape($2);
         sub {
-          $_[0]->{attrs}{$attribute}
+          exists $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} =~ qr/^\Q$value\E/;
         }
       };
@@ -65,7 +66,7 @@ sub _raw_parse_simple_selector {
         my $attribute = $_[0]->_unescape($1);
         my $value = $_[0]->_unescape($2);
         sub {
-          $_[0]->{attrs}{$attribute}
+          exists $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} =~ qr/\Q$value\E$/;
         }
       };
@@ -76,7 +77,7 @@ sub _raw_parse_simple_selector {
         my $attribute = $_[0]->_unescape($1);
         my $value = $_[0]->_unescape($2);
         sub {
-          $_[0]->{attrs}{$attribute}
+          exists $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} =~ qr/\Q$value\E/;
         }
       };
@@ -87,7 +88,7 @@ sub _raw_parse_simple_selector {
         my $attribute = $_[0]->_unescape($1);
         my $value = $_[0]->_unescape($2);
         sub {
-          $_[0]->{attrs}{$attribute}
+          exists $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} =~ qr/\b\Q$value\E\b/;
         }
       };
@@ -98,7 +99,7 @@ sub _raw_parse_simple_selector {
         my $attribute = $_[0]->_unescape($1);
         my $value = $_[0]->_unescape($2);
         sub {
-          $_[0]->{attrs}{$attribute}
+          exists $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} =~ qr/^\Q$value\E(?:-|$)/;
         }
       };
@@ -109,7 +110,7 @@ sub _raw_parse_simple_selector {
         my $attribute = $_[0]->_unescape($1);
         my $value = $_[0]->_unescape($2);
         sub {
-          $_[0]->{attrs}{$attribute}
+          exists $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} eq $value;
         }
       };
@@ -120,7 +121,7 @@ sub _raw_parse_simple_selector {
         my $attribute = $_[0]->_unescape($1);
         my $value = $_[0]->_unescape($2);
         sub {
-          ! ($_[0]->{attrs}{$attribute}
+          ! (exists $_[0]->{attrs}{$attribute}
           && $_[0]->{attrs}{$attribute} eq $value);
         }
       };
