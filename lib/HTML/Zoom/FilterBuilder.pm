@@ -42,9 +42,9 @@ sub set_attribute {
 sub _parse_attribute_args {
   my $self = shift;
 
-  die "Long form arg (name => 'class', value => 'x') is no longer supported"
-    if(@_ == 1 && $_[0]->{'name'} && $_[0]->{'value'});
-    
+  #die "Long form arg (name => 'class', value => 'x') is no longer supported"
+    #if(@_ == 1 && $_[0]->{'name'} && $_[0]->{'value'});
+
   my $opts = ref($_[0]) eq 'HASH' ? $_[0] : {$_[0] => $_[1]};
   for (values %{$opts}) { $self->_zconfig->parser->html_escape($_); }
   return $opts;

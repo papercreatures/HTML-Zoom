@@ -115,6 +115,15 @@ like(
   'Got correct from set_attribute'
 );
 
+like(
+  HTML::Zoom
+    ->from_html(q[<p class="first">Hi!</p>])
+    ->set_attribute('p.first' => { class => 'para' })
+    ->to_html,
+  qr/class="para"/,
+  'Got correct from set_attribute (via hashref)'
+);
+
 is(
   HTML::Zoom
     ->from_html(q[<p class="first">Hi!</p>])
